@@ -52,7 +52,7 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/departments/{parentId}")
 	public ResponseEntity<List<Department>> deptDetailList(
-			@PathVariable int parentId
+			@PathVariable Integer parentId
 			){
 		List<Department> deptDetailList = service.deptDetailList(parentId);
 		

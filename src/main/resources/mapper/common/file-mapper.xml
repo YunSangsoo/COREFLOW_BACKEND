@@ -53,7 +53,7 @@
 	
 	<delete id="removeFile" parameterType="map">
 		DELETE FROM IMAGE
-		WHERE IMAGE_CODE = #{imageCode} AND
+		WHERE IMAGE_CODE = #{fileCode} AND
 		REF_ID = #{refId}
 	</delete>
 </mapper>

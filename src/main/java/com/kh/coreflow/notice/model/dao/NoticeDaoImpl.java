@@ -23,7 +23,7 @@ public class NoticeDaoImpl implements NoticeDao{
 	}
 	
 	@Override
-	public List<NoticeResponse> notiList(Map<String, String> params) {
+	public List<NoticeResponse> notiList(Map<String, Object> params) {
 		return session.selectList("notice.notiList",params);
 	}
 
@@ -37,5 +37,13 @@ public class NoticeDaoImpl implements NoticeDao{
 		return session.selectOne("notice.notiDetail",notiId);
 	}
 
-	
+	@Override
+	public int notiUpdate(NoticeInsert insertParams) {
+		return session.update("notice.notiUpdate",insertParams);
+	}
+
+	@Override
+	public int notiDelete(Map<String, Object> params) {
+		return session.delete("notice.notiDelete",params);
+	}
 }

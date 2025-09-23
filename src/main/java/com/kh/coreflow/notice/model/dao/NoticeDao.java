@@ -11,10 +11,13 @@ public interface NoticeDao {
 
 	List<NoticeResponse> notiList();
 	
-	List<NoticeResponse> notiList(Map<String, String> params);
+	List<NoticeResponse> notiList(Map<String, Object> params);
 
 	int notiInsert(NoticeInsert insertParams);
 
 	NoticeDetail notiDetail(int notiId);
 
+	int notiUpdate(NoticeInsert insertParams);
+
+	int notiDelete(Map<String, Object> params);
 }

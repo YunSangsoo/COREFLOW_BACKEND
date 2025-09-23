@@ -115,13 +115,11 @@ public class MemberServiceImpl implements MemberService{
 
 	@Override
 	public List<MemberLite> search(String query, Integer limit, Long depId) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<DepartmentLite> findAll() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 }

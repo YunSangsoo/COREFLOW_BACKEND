@@ -11,22 +11,45 @@
 			N.ENROLL_DATE,
 			N.ESSENTIAL
 		FROM NOTICE N
-		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER 
+		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER
+		LEFT JOIN DEPARTMENT D ON D.DEP_ID = N.DEP_ID
+		LEFT JOIN POSITIONS P ON P.POS_ID = N.POS_ID
 		WHERE
 			N.STATUS = 'T'
-			<if test="keyword != null and keyword != ''">
-				<choose>
-					<when test="searchType == 'title'">
-						AND N.TITLE LIKE '%'||#{keyword}||'%'
-					</when>
-					<when test="searchType == 'content'">
-						AND N.CONTENT LIKE '%'||#{keyword}||'%'
-					</when>
-					<when test="searchType == 'writer'">
-						AND M.USER_NAME LIKE '%'||#{keyword}||'%'
-					</when>
-				</choose>
-			</if>
+			AND (
+            <!-- 전체 공지 -->
+            (N.DEP_ID IS NULL AND N.POS_ID IS NULL)
+            OR
+            <!-- 부서별 공지 -->
+            (N.DEP_ID IN (
+                SELECT DEP_ID FROM DEPARTMENT
+                START WITH DEP_ID = #{depId}
+                CONNECT BY PRIOR PARENT_ID = DEP_ID
+            ) AND N.POS_ID IS NULL)
+            OR
+            <!-- 직위별 공지 -->
+            (N.DEP_ID IS NULL AND N.POS_ID = #{posId})
+            OR
+            <!-- 부서 직위 공지 -->
+            (N.DEP_ID IN (
+                SELECT DEP_ID FROM DEPARTMENT
+                START WITH DEP_ID = #{depId}
+                CONNECT BY PRIOR PARENT_ID = DEP_ID
+            ) AND N.POS_ID = #{posId})
+        )
+		<if test="keyword != null and keyword != ''">
+			<choose>
+				<when test="searchType == 'title'">
+					AND N.TITLE LIKE '%'||#{keyword}||'%'
+				</when>
+				<when test="searchType == 'content'">
+					AND N.CONTENT LIKE '%'||#{keyword}||'%'
+				</when>
+				<when test="searchType == 'writer'">
+					AND M.USER_NAME LIKE '%'||#{keyword}||'%'
+				</when>
+			</choose>
+		</if>
 		ORDER BY
 			N.ESSENTIAL DESC,
 			N.NOTI_ID DESC
@@ -75,27 +98,50 @@
 	<!-- 공지 상세 조회(첨부파일) -->
 	<select id="notiDetail" resultType="com.kh.coreflow.notice.model.dto.NoticeDto$NoticeDetail">
 		SELECT
+			N.NOTI_ID,
 			N.ESSENTIAL,
 			N.TITLE,
+			N.WRITER,
 			M.USER_NAME,
 			D.DEP_NAME,
 			P.POS_NAME,
+			N.POS_ID,
+			N.DEP_ID AS CHILD_DEP_ID,
+			D.PARENT_ID AS PARENT_DEP_ID,
 			N.ENROLL_DATE,
 			N.UPDATE_DATE,
-			N.CONTENT
+			N.CONTENT,
+			N.END_DATE,
+			N.END_TIME
 		FROM NOTICE N
 		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER
-		LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
-		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
+		LEFT JOIN DEPARTMENT D ON D.DEP_ID = N.DEP_ID
+		LEFT JOIN POSITIONS P ON P.POS_ID = N.POS_ID
 		WHERE NOTI_ID = #{notiId}
 	</select>
 	
+	<!-- 공지 수정(첨부파일) -->
+	<update id="notiUpdate">
+		UPDATE NOTICE
+		<set>
+			<if test="title != null and title != ''">TITLE = #{title},</if>
+			<if test="depId != null">DEP_ID = #{depId},</if>
+			<if test="posId != null">POS_ID = #{posId},</if>
+			<if test="endDate != null and !endDate.isEmpty()">END_DATE = #{endDate},</if>
+			<if test="endTime != null and !endTime.isEmpty()">END_TIME = #{endTime},</if>
+			<if test="content != null and content != ''">CONTENT = #{content},</if>
+			UPDATE_DATE = SYSDATE
+		</set>
+		WHERE
+			NOTI_ID = #{notiId} AND
+			WRITER = #{userNo}
+	</update>
 	
-	
-	
-	
-	
-	
-	
-	
+	<!-- 공지 삭제 -->
+	<delete id="notiDelete">
+		DELETE FROM NOTICE
+		WHERE
+			NOTI_ID = #{notiId} AND
+			WRITER = #{userNo}
+	</delete>
 </mapper>

@@ -1,9 +1,6 @@
 package com.kh.coreflow.notice.model.dto;
 
-import java.util.Date;
 import java.util.List;
-
-import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.common.model.vo.FileDto.customFile;
 
@@ -35,13 +32,12 @@ public class NoticeDto {
 		private String keyword;
 	}
 	
-	
 	// 공지 등록(첨부파일)
 	@Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class NoticeInsert{
-		private int notiId;
+		private long notiId;
 		private long userNo;
 		private String title;
 		private String content;
@@ -50,7 +46,7 @@ public class NoticeDto {
 		private String endTime;
 		private Integer depId;
 		private Integer posId;
-//		private List<customFile> files;
+		private List<customFile> initFile;
 	}
 	
 	// 공지 상세 조회(첨부파일)
@@ -58,14 +54,29 @@ public class NoticeDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class NoticeDetail{
-		private int notiId;
+		private long notiId;
 		private String essential;
 		private String title;
+		private long writer;
 		private String userName;
-		private String depName;
 		private String posName;
+		private Long depId;
+		private Long posId;
 		private String enrollDate;
 		private String updateDate;
 		private String content;
+		private Long parentDepId;
+		private Long childDepId;
+		private String endDate;
+		private String endTime;
+		private List<customFile> files;
+	}
+	
+	// 공지 삭제
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class NotiDelete{
+		private long notiId;
 	}
 }

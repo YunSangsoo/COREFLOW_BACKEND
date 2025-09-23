@@ -172,6 +172,7 @@ public class FileServiceImpl implements FileService {
 				return null;
 		}
 		answer=0;
+		log.info("files : {}",cFiles);
 		for(customFile file: cFiles ) {
 			answer+=fileDao.insertOneImage(file);
 		}

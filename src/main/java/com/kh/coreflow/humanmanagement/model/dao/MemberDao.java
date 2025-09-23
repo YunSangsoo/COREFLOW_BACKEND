@@ -36,6 +36,4 @@ public interface MemberDao {
 	List<MemberLite> searchMembers(String query, Integer limit, Long depId);
 
 	List<DepartmentLite> findAll();
-
-	
 }

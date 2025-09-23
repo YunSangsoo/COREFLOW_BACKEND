@@ -15,7 +15,7 @@ public class MemberDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class Department{
-		private int depId;
+		private Long depId;
 		private String depName;
 		private Integer parentId;
 	}
@@ -24,7 +24,7 @@ public class MemberDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class Position{
-		private int posId;
+		private long posId;
 		private String posName;
 	}
 	
@@ -36,9 +36,9 @@ public class MemberDto {
 		private String userName;
 		private String email;
 		private Date hireDate;
-		private int depId;
+		private Long depId;
 		private String depName;
-		private int posId;
+		private Long posId;
 		private String posName;
 		private String phone;
 		private String extension;
@@ -75,9 +75,9 @@ public class MemberDto {
 		private String userName;
 		private String email;
 		private Date hireDate;
-		private int depId;
+		private Long depId;
 		private String depName;
-		private int posId;
+		private Long posId;
 		private String posName;
 		private String phone;
 		private String extension;

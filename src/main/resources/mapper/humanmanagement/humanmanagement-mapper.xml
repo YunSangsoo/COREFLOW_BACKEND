@@ -176,6 +176,4 @@
     FROM DEPARTMENT
     ORDER BY DEP_NAME ASC
   </select>
-
-
 </mapper>

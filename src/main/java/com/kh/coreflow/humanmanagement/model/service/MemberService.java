@@ -7,8 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
-import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
-import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberLite;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
@@ -36,5 +34,4 @@ public interface MemberService {
 	List<MemberDto.MemberLite> search(String query, Integer limit, Long depId);
 	
 	List<MemberDto.DepartmentLite> findAll();
-
 }
