@@ -1,6 +1,7 @@
 package com.kh.coreflow.notice.controller;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +46,6 @@ public class NoticeController {
 	@GetMapping("/notice/main")
 	public ResponseEntity<List<NoticeResponse>> notice(
 			@AuthenticationPrincipal UserDeptcode auth,
-//			@RequestParam(value="searchType", defaultValue="title", required=false) String searchType,
-//			@RequestParam(value="keyword", required=false) String keyword,
 			@ModelAttribute NoticeSearch noticeSearch
 			){
 		
@@ -84,17 +83,20 @@ public class NoticeController {
 	@PostMapping("/notice/insert")
 	public ResponseEntity<Void> noticeInsert(
 			@AuthenticationPrincipal UserDeptcode auth,
-			@RequestBody NoticeInsert insertParams
-//			@RequestParam(value = "files", required=false) List<MultipartFile> file
+			@RequestBody NoticeInsert insertParams,
+			@RequestParam(value = "files", required=false) List<MultipartFile> files
 			){
 		//NOTICE 테이블에 저장하고 NOTI ID 갖고 오기
 		insertParams.setUserNo(auth.getUserNo());
 		log.info("insert Params : {}",insertParams);
-//		List<customFile> notiFile;
-//		if(file.size()>0) {
-//			notiFile = fileService.setOrChangeOneImage(file, insertParams.getNotiId(), "N");
-//			log.info("notiFile : {}",notiFile);
-//		}
+		
+		// 파일 똥코드
+		List<customFile> notiFile = new ArrayList<>();
+		if(insertParams.getFiles().size() > 0) {
+			notiFile = fileService.setOrChangeImage(files, insertParams.getNotiId(), "N");
+			log.info("notiFile : {}",notiFile);
+			insertParams.setFiles(notiFile);
+		}
 		
 		int result = service.notiInsert(insertParams);
 		
@@ -108,9 +110,12 @@ public class NoticeController {
 	// 공지 상세 조회(첨부파일)
 	@GetMapping("/notice/detail/{notiId}")
 	public ResponseEntity<NoticeDetail> noticeDetail(
-			@PathVariable int notiId
+			@PathVariable int notiId,
+			@RequestParam(value = "files", required=false) List<MultipartFile> files
 			){
+
 		NoticeDetail notiDetail = service.notiDetail(notiId);
+		notiDetail.setFiles(files);
 		
 		if(notiDetail != null) {
 			if(notiDetail.getParentDepId() == null) {

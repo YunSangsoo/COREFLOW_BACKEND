@@ -42,7 +42,7 @@ public class NoticeDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class NoticeInsert{
-		private int notiId;
+		private Long notiId;
 		private long userNo;
 		private String title;
 		private String content;
@@ -51,7 +51,7 @@ public class NoticeDto {
 		private String endTime;
 		private Integer depId;
 		private Integer posId;
-//		private List<customFile> files;
+		private List<customFile> files;
 	}
 	
 	// 공지 상세 조회(첨부파일)
@@ -74,6 +74,7 @@ public class NoticeDto {
 		private Long childDepId;
 		private String endDate;
 		private String endTime;
+		private List<MultipartFile> files;
 	}
 	
 	// 공지 삭제
