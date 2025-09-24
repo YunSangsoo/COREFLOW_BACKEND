@@ -28,14 +28,14 @@
             ) AND N.POS_ID IS NULL)
             OR
             <!-- 직위별 공지 -->
-            (N.DEP_ID IS NULL AND N.POS_ID = 1)
+            (N.DEP_ID IS NULL AND N.POS_ID = #{posId})
             OR
             <!-- 부서 직위 공지 -->
             (N.DEP_ID IN (
                 SELECT DEP_ID FROM DEPARTMENT
                 START WITH DEP_ID = #{depId}
                 CONNECT BY PRIOR PARENT_ID = DEP_ID
-            ) AND N.POS_ID = 1)
+            ) AND N.POS_ID = #{posId})
         )
 		<if test="keyword != null and keyword != ''">
 			<choose>
@@ -124,16 +124,16 @@
 	<update id="notiUpdate">
 		UPDATE NOTICE
 		<set>
-			<if test="insertParams.title != null and insertParams.title != ''">TITLE = #{insertParams.title},</if>
-			<if test="insertParams.depId != null">DEP_ID = #{insertParams.depId},</if>
-			<if test="insertParams.posId != null">POS_ID = #{insertParams.posId},</if>
-			<if test="insertParams.endDate != null and !insertParams.endDate.isEmpty()">END_DATE = #{insertParams.endDate},</if>
-			<if test="insertParams.endTime != null and !insertParams.endTime.isEmpty()">END_TIME = #{insertParams.endTime},</if>
-			<if test="insertParams.content != null and insertParams.content != ''">CONTENT = #{insertParams.content},</if>
+			<if test="title != null and title != ''">TITLE = #{title},</if>
+			<if test="depId != null">DEP_ID = #{depId},</if>
+			<if test="posId != null">POS_ID = #{posId},</if>
+			<if test="endDate != null and !endDate.isEmpty()">END_DATE = #{endDate},</if>
+			<if test="endTime != null and !endTime.isEmpty()">END_TIME = #{endTime},</if>
+			<if test="content != null and content != ''">CONTENT = #{content},</if>
 			UPDATE_DATE = SYSDATE
 		</set>
 		WHERE
-			NOTI_ID = #{notiId} AND 
+			NOTI_ID = #{notiId} AND
 			WRITER = #{userNo}
 	</update>
 	

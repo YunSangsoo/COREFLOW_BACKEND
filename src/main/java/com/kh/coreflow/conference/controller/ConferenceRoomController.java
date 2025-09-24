@@ -38,7 +38,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.kh.coreflow.conference.model.dto.ConferenceRoomDto;
 import com.kh.coreflow.conference.service.ConferenceRoomService;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +78,7 @@ public class ConferenceRoomController {
     @PreAuthorize("hasAnyRole('HR','ADMIN')")
     @PostMapping
     public ResponseEntity<Long> create(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @RequestBody ConferenceRoomDto.CreateReq req
     ) {
         if (me == null) return ResponseEntity.status(401).build();
@@ -89,7 +89,7 @@ public class ConferenceRoomController {
     /* 회의실 예약 생성(HOLD 또는 즉시 확정) */
     @PostMapping("/reservations")
     public ResponseEntity<Long> createReservation(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @RequestBody ConferenceRoomDto.ReservationCreateReq req
     ) {
         if (me == null) return ResponseEntity.status(401).build();
@@ -103,7 +103,7 @@ public class ConferenceRoomController {
     /* 내 예약 조회 (옵션: roomId, from, to) */
     @GetMapping("/{roomId}/my-reservations")
     public ResponseEntity<List<ConferenceRoomDto.ReservationRes>> myReservations(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long roomId,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
@@ -271,7 +271,7 @@ public class ConferenceRoomController {
     // 예약 취소 (idempotent)
     @PostMapping("/reservations/{resvId}/cancel")
     public ResponseEntity<Void> cancelReservation(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long resvId
     ) {
         if (me == null) return ResponseEntity.status(401).build();
@@ -282,7 +282,7 @@ public class ConferenceRoomController {
     // 예약 시간 변경(겹침 검사 포함)
     @PostMapping("/reservations/{resvId}/time")
     public ResponseEntity<ConferenceRoomDto.ReservationRes> updateReservationTime(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long resvId,
             @RequestBody ConferenceRoomDto.ReservationTimeUpdateReq req
     ) {
@@ -293,7 +293,7 @@ public class ConferenceRoomController {
     // 이벤트와 연결(이벤트 시간으로 동기화, HOLD였다면 확정)
     @PostMapping("/reservations/{resvId}/attach-event")
     public ResponseEntity<ConferenceRoomDto.ReservationRes> attachEvent(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long resvId,
             @RequestBody ConferenceRoomDto.ReservationAttachEventReq req
     ) {

@@ -37,13 +37,11 @@ public interface ChattingDao {
 
 	Long findRoomByMember(List<Long> privateMember, String type);
 
-	chatRooms openChat(Long roomId);
-
 	int makeChatJoin(Long roomId, List<Long> list);
 
 	User findUserByUserNo(Long userNo);
 
-	chatRooms getRoom(Long roomId);
+	chatRooms getRoom(Long userNo,Long roomId);
 
 	List<Long> getParticipantUserNos(Long roomId);
 
@@ -64,5 +62,7 @@ public interface ChattingDao {
 	int changeMessage(chatMessages message);
 
 	int leaveRoom(Long roomId, Long userNo);
+
+	int alarmChange(chatRooms bodyRoom);
 
 }

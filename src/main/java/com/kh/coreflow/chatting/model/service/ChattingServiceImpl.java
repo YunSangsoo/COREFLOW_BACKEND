@@ -1,5 +1,6 @@
 package com.kh.coreflow.chatting.model.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+
 import com.kh.coreflow.model.dto.UserDto.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,9 @@ public class ChattingServiceImpl implements ChattingService {
 	
 	@Autowired
 	private AuthDao authDao;
+	
+	@Autowired
+	private final SimpMessagingTemplate messagingTemplate;
 	
 	@Override
 	public List<chatProfile> getChatProfiles(Long userNo) {
@@ -125,16 +131,16 @@ public class ChattingServiceImpl implements ChattingService {
 
 	@Override
 	@Transactional
-	public chatRooms openChat(List<Long> privateMember,String type) {
+	public chatRooms openChat(Long userNo,List<Long> privateMember,String type) {
 		Long roomId = chattingDao.findRoomByMember(privateMember,type);
 		if(roomId==null)
 			return null;
-		return chattingDao.openChat(roomId);
+		return chattingDao.getRoom(userNo,roomId);
 	}
 
 	@Override
-	public chatRooms getRoom(Long roomId) {
-		return chattingDao.getRoom(roomId);
+	public chatRooms getRoom(Long userNo,Long roomId) {
+		return chattingDao.getRoom(userNo,roomId);
 	}
 
 	@Override
@@ -185,6 +191,43 @@ public class ChattingServiceImpl implements ChattingService {
 	@Override
 	public int leaveRoom(Long roomId, Long userNo) {
 		return chattingDao.leaveRoom(roomId,userNo);
+	}
+
+	@Override
+	public int alarmChange(chatRooms bodyRoom) {
+		return chattingDao.alarmChange(bodyRoom);
+	}
+	
+	@Transactional
+	@Override
+	public chatMessages createMissedCallMessage(Long senderNo, Long partnerNo) {
+		// 1. 두 사용자 간의 채팅방 ID를 찾습니다.
+		List<Long> userList = new ArrayList<Long>();
+		userList.add(senderNo);
+		userList.add(partnerNo);
+		Long roomId = chattingDao.findRoomByMember(userList, "PRIVATE");
+		chatProfile senderProfile = chattingDao.getMyProfile(senderNo);
+        // 2. DB에 저장할 ChatMessage 객체를 생성합니다.
+        chatMessages missedCallMessage = new chatMessages();
+        missedCallMessage.setRoomId(roomId);
+        missedCallMessage.setUserNo(senderNo);
+        missedCallMessage.setUserName(senderProfile.getUserName());
+        missedCallMessage.setType(chatMessages.MessageType.VIDEO_CALL_INVITE);
+        missedCallMessage.setMessageText("영상통화를 걸었습니다.");
+        
+        // 3. 메시지를 DB에 저장합니다.
+        int result = chattingDao.insertMessage(missedCallMessage);
+        
+        if (result > 0) {
+            // 4. 저장이 성공하면, 해당 채팅방 토픽으로 메시지를 방송합니다.
+            messagingTemplate.convertAndSend(
+                "/topic/room/" + roomId, 
+                missedCallMessage
+            );
+            return missedCallMessage;
+        }
+        else
+        	return null;
 	}
 
 }

@@ -27,7 +27,6 @@ public class FileDaoImpl implements FileDao{
 		return session.selectOne("image.getFile",param);
 	}
 	
-
 	@Override
 	public List<customFile> getFiles(String imageCode, Long refId) {
 		Map<String,Object> param = new HashMap<String,Object>();
@@ -61,5 +60,4 @@ public class FileDaoImpl implements FileDao{
 		param.put("refId", refId);
 		return session.delete("image.removeFile",param);
 	}
-
 }

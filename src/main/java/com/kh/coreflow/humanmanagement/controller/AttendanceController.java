@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,7 +24,7 @@ import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.PutCheckOut;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacType;
 import com.kh.coreflow.humanmanagement.model.dto.AttendanceDto.VacTypeUpdate;
 import com.kh.coreflow.humanmanagement.model.service.AttendanceService;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,16 +32,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/attendance")
 public class AttendanceController {
 	private final AttendanceService service;
 	
 	// 전체 사원 근태 정보 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
-	@GetMapping("/attendance/member")
+	@GetMapping("/member")
 	public ResponseEntity<List<AttendanceInfo>> allAttendance(
 			@RequestParam(value="attDate", required=true) String attDateStr,
-			@RequestParam(value="userNo", required=false) Integer userNo
+			@RequestParam(value="userNo", required=false) Long userNo
 			) {
 		LocalDate attDate = LocalDate.parse(attDateStr,DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		
@@ -60,13 +62,13 @@ public class AttendanceController {
 	
 	// 로그인 사용자 근태 정보 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/attendance/personal")
+	@GetMapping("/personal")
 	public ResponseEntity<List<AttendanceInfo>> personalAttendance(
 			Authentication auth,
 			@RequestParam int year,
 			@RequestParam int month
 			){
-		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 				
 		Map<String,Object> params = new HashMap<>();
 		params.put("userNo", userNo);
@@ -84,12 +86,12 @@ public class AttendanceController {
 	
 	// 출근버튼 클릭시 
 	@CrossOrigin(origins="http://localhost:5173")
-	@PostMapping("/attendance/checkIn")
+	@PostMapping("/checkIn")
 	public ResponseEntity<Void> checkIn(
 			Authentication auth,
 			@RequestBody PutCheckIn checkIn
 			){
-		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("userNo", userNo);
@@ -106,7 +108,7 @@ public class AttendanceController {
 	
 	// 퇴근버튼 클릭시
 	@CrossOrigin(origins="http://localhost:5173")
-	@PatchMapping("/attendance/checkOut")
+	@PatchMapping("/checkOut")
 	public ResponseEntity<Void> checkOut(
 			@RequestBody PutCheckOut checkOut
 			){
@@ -122,7 +124,7 @@ public class AttendanceController {
 	// 비고 종류 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
-	@GetMapping("/attendance/vacType")
+	@GetMapping("/vacType")
 	public ResponseEntity<List<VacType>> vacationType(
 			VacType vacType
 			){
@@ -137,7 +139,7 @@ public class AttendanceController {
 	
 	// 비고 수정
 	@CrossOrigin(origins="http://localhost:5173")
-	@PatchMapping("/attendance/vacType")
+	@PatchMapping("/vacType")
 	public ResponseEntity<Void> vacationTypeUpdate(
 			@RequestBody VacTypeUpdate vacTypeUpdate
 			){		

@@ -10,7 +10,7 @@ public class AttendanceDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class AttendanceInfo{
-		private int attId;
+		private Long attId;
 		private String attDate;
 		private String userName;
 		private String depName;
@@ -24,7 +24,7 @@ public class AttendanceDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class PutCheckIn{
-		private int attId;
+		private Long attId;
 		private String attDate;
 		private String checkInTime;
 		private int status;
@@ -34,7 +34,7 @@ public class AttendanceDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class PutCheckOut{
-		private int attId;
+		private Long attId;
 		private String checkOutTime;
 	}
 	
@@ -42,7 +42,7 @@ public class AttendanceDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class VacType{
-		private Integer vacCode;
+		private Long vacCode;
 		private String vacName;
 	}
 	
@@ -50,7 +50,7 @@ public class AttendanceDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class VacTypeUpdate{
-		private Integer attId;
+		private Long attId;
 		private int vacCode;
 	}
 }

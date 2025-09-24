@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto.CompanyPolicy;
 import com.kh.coreflow.companypolicy.model.dto.CompanyPolicyDto.CompanyPolicyModHistory;
 import com.kh.coreflow.companypolicy.model.service.CompanyPolicyService;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -62,7 +62,7 @@ public class CompanyPolicyController {
 			@RequestBody CompanyPolicy policy,
 			Authentication auth
 			) {
-		Long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		policy.setCreatorUserNo(userNo);
 		
 		int result = service.addPolicy(policy);
@@ -89,7 +89,7 @@ public class CompanyPolicyController {
 			@PathVariable Long policyId,
 			Authentication auth
 			) {
-		Long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		history.setUserNo(userNo);
 		history.setPolicyId(policyId);
 		

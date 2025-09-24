@@ -1,18 +1,11 @@
 package com.kh.coreflow.personal.model.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.model.dao.AuthDao;
@@ -31,10 +24,7 @@ public class UserServiceImpl implements UserService{
 	
 	@Autowired
 	private final AuthDao authDao;
-	
 	private final PasswordEncoder encoder;
-	
-	
 	
 	@Override
 	public List<Object> getMySchedule(Long userNo) {
@@ -51,10 +41,18 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
-	public void updatePassword(Long userNo, String userPwd, String string) {
+	public void updatePassword(Long userNo, String currentPwd, String newPwd) {
+		// 사용자 조회
 		User user = authDao.findUserByUserNo(userNo)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-		String encodedPwd = encoder.encode(string);
+		
+		// 비밀번호 일치확인
+		if (!encoder.matches(currentPwd, user.getUserPwd())) {
+			throw new BadCredentialsException("현재 비밀번호가 일치하지 않습니다.");
+		}
+		
+		// 새 비밀번호 암호화 및 저장
+		String encodedPwd = encoder.encode(newPwd);
 		authDao.updatePwd(user.getEmail(), encodedPwd);
 	}
 
@@ -67,50 +65,5 @@ public class UserServiceImpl implements UserService{
 	public void updateAddress(Long userNo, String string, String string2) {
 		authDao.updateAddress(userNo, string, string2);
 	}
-	
-	@Override
-	@Transactional
-	public String updateProfileImage(Long userNo, MultipartFile profile) {
-		String webPath = "/resources/static/images/p/";
-        String serverFolderPath = "src/main/resources/static/images/p/";
-        File dir = new File(serverFolderPath);
-		System.out.println(dir.getAbsolutePath());
-        if(!dir.exists()) dir.mkdirs();
-        
-        System.out.println(profile.isEmpty());
-        
-        Map<String, Object> imageUpdate = new HashMap<>();
-
-        String originName = profile.getOriginalFilename();
-        String currentTime = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
-        String ext = originName.substring(originName.lastIndexOf("."));
-        String changeName = currentTime + ext;
-        try {
-            profile.transferTo(new File(dir.getAbsolutePath() + "\\" + changeName));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        imageUpdate.put("originName", originName);
-        imageUpdate.put("changeName", changeName);
-        imageUpdate.put("currentTime", currentTime);
-        imageUpdate.put("userNo", userNo);
-        
-        int count = authDao.checkProfileImage(userNo);
-        
-        if(count > 0) authDao.updateProfileImage(imageUpdate);
-        else authDao.insertProfileImage(imageUpdate);
-        
-        System.out.println("DB 반영 결과: " + count);
-        
-        File savedFile = new File(dir.getAbsolutePath() + "\\" + changeName);
-        
-        System.out.println("파일 저장됨? " + savedFile.exists());
-
-        return webPath + changeName; // 반환할 URL
-	}
-
-	
-	
 	
 }

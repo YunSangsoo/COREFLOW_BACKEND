@@ -19,7 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.kh.coreflow.calendar.model.dto.EventDto;
 import com.kh.coreflow.calendar.model.service.EventService;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 import com.kh.coreflow.security.CustomUserDetails;
 
 import jakarta.validation.Valid;
@@ -39,7 +39,7 @@ public class EventController {
 
     @GetMapping
     public ResponseEntity<List<EventDto.Res>> list(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @RequestParam Long calendarId,
             @RequestParam String from,
             @RequestParam String to
@@ -50,7 +50,7 @@ public class EventController {
 
     @PostMapping
     public ResponseEntity<EventIdResponse> create(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @Valid @RequestBody EventDto.Req req
     ) {
         if (me == null) return ResponseEntity.status(401).build();
@@ -71,7 +71,7 @@ public class EventController {
 
     @PutMapping("/{eventId}")
     public ResponseEntity<Void> update(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long eventId,
             @Valid @RequestBody EventDto.Req req
     ) {
@@ -82,7 +82,7 @@ public class EventController {
 
     @DeleteMapping("/{eventId}")
     public ResponseEntity<Void> delete(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long eventId
     ) {
         if (me == null) return ResponseEntity.status(401).build();
@@ -124,7 +124,7 @@ public class EventController {
     
     @GetMapping("/event-types")
     public ResponseEntity<List<EventDto.EventTypeDto>> listEventTypes(
-            @AuthenticationPrincipal UserDeptcode me
+            @AuthenticationPrincipal UserDeptPoscode me
     ) {
         if (me == null) return ResponseEntity.status(401).build();
         return ResponseEntity.ok(eventService.getEventTypes());
@@ -132,7 +132,7 @@ public class EventController {
 
     @PostMapping("/event-types")
     public ResponseEntity<EventDto.EventTypeDto> createEventType(
-        @AuthenticationPrincipal UserDeptcode me,
+        @AuthenticationPrincipal UserDeptPoscode me,
         @RequestBody Map<String,String> body
     ){
       if (me == null) return ResponseEntity.status(401).build();
@@ -145,7 +145,7 @@ public class EventController {
 
     @PutMapping("/event-types/{typeId}")
     public ResponseEntity<Void> updateEventType(
-        @AuthenticationPrincipal UserDeptcode me,
+        @AuthenticationPrincipal UserDeptPoscode me,
         @PathVariable Long typeId,
         @RequestBody Map<String,String> body
     ){
@@ -156,7 +156,7 @@ public class EventController {
 
     @DeleteMapping("/event-types/{typeId}")
     public ResponseEntity<Void> deleteEventType(
-        @AuthenticationPrincipal UserDeptcode me,
+        @AuthenticationPrincipal UserDeptPoscode me,
         @PathVariable Long typeId
     ){
       if (me == null) return ResponseEntity.status(401).build();
@@ -167,7 +167,7 @@ public class EventController {
     // 단건 상세
     @GetMapping("/{eventId}/detail")
     public ResponseEntity<EventDto.DetailRes> eventDetail(
-            @AuthenticationPrincipal com.kh.coreflow.model.dto.UserDto.UserDeptcode me,
+            @AuthenticationPrincipal com.kh.coreflow.model.dto.UserDto.UserDeptPoscode me,
             @PathVariable Long eventId
     ) {
         if (me == null) return ResponseEntity.status(401).build();

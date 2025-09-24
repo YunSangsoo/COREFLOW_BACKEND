@@ -14,8 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
@@ -32,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 public class MemberController {
 	private final MemberService service;
+	private final FileService fileService;
 	
 	// 부모 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
@@ -50,7 +55,7 @@ public class MemberController {
 	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/departments/{parentId}")
 	public ResponseEntity<List<Department>> deptDetailList(
-			@PathVariable int parentId
+			@PathVariable Integer parentId
 			){
 		List<Department> deptDetailList = service.deptDetailList(parentId);
 		
@@ -94,11 +99,20 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/members/{userNo}")
 	public ResponseEntity<MemberResponse> memberDetail(
-			@PathVariable int userNo
+			@PathVariable Long userNo
 			){
-		MemberResponse member = service.memberDetail(userNo);
+		customFile profile = fileService.getFile("P",userNo);
+		if(profile == null) {
+			customFile tempProfile = new customFile();
+			tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
+			tempProfile.setImageCode("P");
+			tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
+			profile = tempProfile;
+		}
 		
-		if(member != null) {
+		MemberResponse member = service.memberDetail(userNo);
+				
+		if(member != null) {	
 			return ResponseEntity.ok(member);
 		}else {
 			return ResponseEntity.notFound().build();
@@ -110,9 +124,10 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@PostMapping("/members")
 	public ResponseEntity<Void> memberInsert(
-			@RequestBody MemberPost member
+			@RequestPart("data") MemberPost member,
+			@RequestPart(value = "profile", required = false) MultipartFile profile
 			){
-		int result = service.memberInsert(member);
+		int result = service.memberInsert(member, profile);
 		
 		if(result > 0) {
 			return ResponseEntity.created(URI.create("/members")).build();
@@ -126,11 +141,12 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@PatchMapping("/members/{userNo}")
 	public ResponseEntity<Void> memberUpdate(
-			@PathVariable int userNo,
-			@RequestBody MemberPatch member
+			@PathVariable Long userNo,
+			@RequestPart(value= "memberdata") MemberPatch member,
+			@RequestPart(value = "profile", required=false) MultipartFile file
 			){
 		member.setUserNo(userNo);
-		int result = service.memberUpdate(member);
+		int result = service.memberUpdate(member,file);
 		
 		if(result > 0) {
 			return ResponseEntity.noContent().build();
@@ -144,7 +160,7 @@ public class MemberController {
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@DeleteMapping("members/{userNo}")
 	public ResponseEntity<Void> memberDelete(
-			@PathVariable int userNo
+			@PathVariable Long userNo
 			) {
 		int result = service.memberDelete(userNo);
 		

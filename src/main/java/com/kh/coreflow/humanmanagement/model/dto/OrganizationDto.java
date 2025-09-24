@@ -9,7 +9,7 @@ public class OrganizationDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class ParentDep{
-		private int depId;
+		private Long depId;
 		private String depName;
 	}
 	
@@ -17,7 +17,7 @@ public class OrganizationDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class ChildDep{
-		private int depId;
+		private Long depId;
 		private String depName;
 		private Integer parentId;
 	}

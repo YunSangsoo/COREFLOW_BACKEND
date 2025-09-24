@@ -3,6 +3,7 @@ package com.kh.coreflow.chatting.model.dao;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
@@ -91,11 +92,6 @@ public class ChattingDaoImpl implements ChattingDao {
 	}
 
 	@Override
-	public chatRooms openChat(Long roomId) {
-		return session.selectOne("chat.openChat",roomId);
-	}
-
-	@Override
 	public int makeChatJoin(Long roomId, List<Long> chatRoomJoin) {
 		Map<String, Object> params = new HashMap<>();
 	    params.put("roomId", roomId);
@@ -109,8 +105,11 @@ public class ChattingDaoImpl implements ChattingDao {
 	}
 
 	@Override
-	public chatRooms getRoom(Long roomId) {
-		return session.selectOne("chat.getRoom",roomId);
+	public chatRooms getRoom(Long userNo,Long roomId) {
+		chatRooms result = session.selectOne("chat.getRoom",roomId);
+		List<chatProfile> partners = getRoomUsers(roomId);
+		result.setPartner(partners.stream().filter(partner->(userNo!=partner.getUserNo())).collect(Collectors.toList()));
+		return result;
 	}
 
 	@Override
@@ -179,6 +178,11 @@ public class ChattingDaoImpl implements ChattingDao {
 	    params.put("roomId", roomId);
 	    params.put("userNo", userNo);
 		return session.delete("chat.leaveRoom",params);
+	}
+
+	@Override
+	public int alarmChange(chatRooms bodyRoom) {
+		return session.update("chat.alarmChange",bodyRoom);
 	}
 
 }

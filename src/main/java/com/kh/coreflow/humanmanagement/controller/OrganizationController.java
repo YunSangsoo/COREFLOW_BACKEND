@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
@@ -19,12 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/organization")
 public class OrganizationController {
 	private final OrganizationService service;
 	
 	// 1. 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/organization/departments")
+	@GetMapping("/departments")
 	public ResponseEntity<List<ParentDep>> parentDepartment(){
 		List<ParentDep> parentDeptList = service.parentDeptList();
 
@@ -37,7 +39,7 @@ public class OrganizationController {
 	
 	// 2. 자식 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/organization/departments/{parentId}")
+	@GetMapping("/departments/{parentId}")
 	public ResponseEntity<List<ChildDep>> childDepartment(
 			@PathVariable int parentId
 			){
@@ -52,7 +54,7 @@ public class OrganizationController {
 	
 	// 3. 부서별 사원 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/organization/members/{depId}")
+	@GetMapping("/members/{depId}")
 	public ResponseEntity<List<MemberResponse>> member(
 			@PathVariable int depId
 			){

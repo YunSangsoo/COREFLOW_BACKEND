@@ -9,7 +9,7 @@ import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfile;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatProfileDetail;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.chatRooms;
 import com.kh.coreflow.chatting.model.dto.ChattingDto.userFavorite;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 public interface ChattingService {
 
@@ -31,9 +31,9 @@ public interface ChattingService {
 
 	Long makeChat(Long userNo, Map<String, Object> newChatParam, String string);
 
-	chatRooms openChat(List<Long> privateMember, String string);
+	chatRooms openChat(Long userNo, List<Long> privateMember, String string);
 
-	chatRooms getRoom(Long roomId);
+	chatRooms getRoom(Long userNo,Long roomId);
 
 	List<Long> getParticipantUserNos(Long roomId);
 
@@ -54,5 +54,9 @@ public interface ChattingService {
 	int changeMessage(chatMessages message);
 
 	int leaveRoom(Long roomId, Long userNo);
+
+	int alarmChange(chatRooms bodyRoom);
+	
+	chatMessages createMissedCallMessage(Long userNo, Long partnerNo);
 
 }

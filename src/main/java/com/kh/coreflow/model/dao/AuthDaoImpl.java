@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.stereotype.Repository;
+
 import com.kh.coreflow.model.dto.UserDto.User;
 import com.kh.coreflow.model.dto.UserDto.UserAuthority;
 
@@ -59,21 +60,6 @@ public class AuthDaoImpl implements AuthDao{
 	}
 
 	@Override
-	public int checkProfileImage(Long userNo) {
-		return session.selectOne("auth.checkProfileImage", userNo);
-	}
-	
-	@Override
-	public void insertProfileImage(Map<String, Object> imageUpdate) {
-		session.insert("auth.insertProfileImage", imageUpdate);
-	}
-	
-	@Override
-	public void updateProfileImage(Map<String, Object> imageUpdate) {
-		session.update("auth.updateProfileImage", imageUpdate);
-	}
-
-	@Override
 	public void updatePhone(Long userNo, String string) {
 		Map<String, Object> param = new HashMap<>();
 		param.put("userNo", userNo);
@@ -99,6 +85,16 @@ public class AuthDaoImpl implements AuthDao{
 	            .userNo(userNo)
 	            .roles(roles)
 	            .build();
+	}	
+
+	@Override
+	public long findUserNoByEmail(String email) {
+		return session.selectOne("auth.findUserNoByEmail", email);
+	}
+
+	@Override
+	public boolean isEmailExists(String email) {
+		return session.selectOne("auth.isEmailExists", email);
 	}
 	
 	

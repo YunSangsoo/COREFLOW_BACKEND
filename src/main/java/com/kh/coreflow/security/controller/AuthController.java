@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.kh.coreflow.common.model.service.FileService;
+import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.model.dto.UserDto.AuthResult;
 import com.kh.coreflow.model.dto.UserDto.FindPwdRequest;
 import com.kh.coreflow.model.dto.UserDto.LoginRequest;
@@ -43,11 +45,13 @@ public class AuthController {
 
 	private final AuthService service;
 	private final UserService userService;
+	private final FileService fileService;
 	private final JWTProvider jwt;
 	public static final String REFRESH_COOKIE = "REFRESH_TOKEN0";
 	
 	@Autowired
 	private final ServletContext servlet;
+	
 	
 	@PostMapping("/login")
 	public ResponseEntity<AuthResult> login(@RequestBody LoginRequest req){
@@ -90,10 +94,10 @@ public class AuthController {
 		// 전체 쿠키 확인
 	    if (request.getCookies() != null) {
 	        for (var c : request.getCookies()) {
-	            System.out.println("Cookie: " + c.getName() + " = " + c.getValue());
+	            //System.out.println("Cookie: " + c.getName() + " = " + c.getValue());
 	        }
 	    } else {
-	        System.out.println("No cookies received");
+	        //System.out.println("No cookies received");
 	    }
 		
 		if(refreshCookie == null || refreshCookie.isBlank()) {
@@ -197,8 +201,19 @@ public class AuthController {
     		@RequestPart("profile") MultipartFile profile) {
     	
     	if(profile != null && !profile.isEmpty()) {
-            String url = userService.updateProfileImage(userNo, profile);
-            return ResponseEntity.ok(url);
+            //String url = userService.updateProfileImage(userNo, profile); 미사용
+    		customFile url = fileService.setOrChangeOneImage(profile,userNo,"P");
+    		
+            Optional<User> userOpt = service.findUserByUserNo(userNo);
+            if (userOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                				.body("User not found");
+            }
+            User user = userOpt.get();
+            user.setProfile(url);
+            log.info("img:{}",url);
+            
+            return ResponseEntity.ok(user);
         }
         return ResponseEntity.badRequest().body("No file uploaded");
     }
@@ -225,16 +240,3 @@ public class AuthController {
 	    return null; // 쿠키에 refreshToken이 없는 경우
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

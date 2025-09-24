@@ -4,6 +4,14 @@
 	
 	<resultMap id="UserResult" type="com.kh.coreflow.model.dto.UserDto$User" autoMapping="true">
 		<id property="userNo" column="USER_NO" />
+		<association property="profile" javaType="com.kh.coreflow.common.model.vo.FileDto$customFile">
+			<result property="imgId" column="IMG_ID"/>
+			<result property="imageCode" column="IMAGE_CODE"/>
+			<result property="originName" column="ORIGIN_NAME"/>
+			<result property="changeName" column="CHANGE_NAME"/>
+			<result property="imgOrder" column="IMG_ORDER"/>
+			<result property="refId" column="REF_ID"/>
+		</association>
 	</resultMap>
 	
 	<resultMap id="userAuthorityMap" type="com.kh.coreflow.model.dto.UserDto$UserAuthority">
@@ -18,12 +26,8 @@
 	    WHERE UPPER(EMAIL) = UPPER(#{email})
 	</select>
 	
-	<!-- 계정생성 임시 -->
-	<insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="userNo" keyColumn="USER_NO">
-		INSERT INTO MEMBER(EMAIL, USER_NAME, USER_PWD)
-		VALUES (#{email}, #{userName}, #{userPwd})
-	</insert>
-	<insert id="insertUserRole">
+	<!-- 계정생성(권한 부여) -->
+	<insert id="insertUserRole" parameterType="com.kh.coreflow.model.dto.UserDto$UserAuthority">
     	INSERT ALL
     	<foreach collection="roles" item="role">
 		INTO AUTHORITY(USER_NO, AUTHORITY)
@@ -32,9 +36,17 @@
     	SELECT 1 FROM DUAL
 	</insert>
 	
+	<!-- userNo 조회 -->
+	<select id="findUserNoByEmail" resultType="long">
+		SELECT USER_NO
+		FROM MEMBER
+		WHERE EMAIL = #{email}
+	</select>
+	
 	<select id="findUserByUserNo" resultMap="UserResult">
-        SELECT M.*
+        SELECT M.*, I.*
         FROM MEMBER M
+        LEFT JOIN IMAGE I ON M.USER_NO = I.REF_ID AND I.IMAGE_CODE = 'P'
         WHERE M.USER_NO = #{userNo}
     </select>
     
@@ -63,34 +75,21 @@
     	WHERE USER_NO = #{userNo}
     </update>
     
-    <select id="checkProfileImage" resultType="int">
-    	SELECT COUNT(*) 
-	    FROM IMAGE
-	    WHERE REF_ID = #{userNo}
-    </select>
-    
-    <insert id="insertProfileImage" parameterType="map">
-    	INSERT INTO IMAGE 
-    		(IMG_ID, IMAGE_CODE, ORIGIN_NAME, CHANGE_NAME, IMG_ORDER, CREATE_DATE, REF_ID)
-    	VALUES 
-    		(IMAGE_SEQ.NEXTVAL, 'P', #{originName}, #{changeName}, 1, #{currentTime}, #{userNo})
-    </insert>
-	
-	<update id="updateProfileImage" parameterType="map">
-		UPDATE IMAGE
-		<set>
-			IMG_ID = IMAGE_SEQ.NEXTVAL,
-			ORIGIN_NAME = #{originName},
-			CHANGE_NAME = #{changeName},
-        	CREATE_DATE = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
-		</set>
-		WHERE REF_ID = #{userNo}
-	</update>
-	
 	<select id="findUserAuthorityByUserNo" resultType="string">
 	    SELECT AUTHORITY
 	    FROM AUTHORITY
 	    WHERE USER_NO = #{userNo}
+	</select>
+	
+	<select id="findUserProfileByUserNo" resultType="com.kh.coreflow.model.dto.ImageDto$Profile">
+		SELECT IMAGE_CODE, CHANGE_NAME
+		FROM IMAGE
+		WHERE REF_ID = #{userNo}
+	</select>
+	
+	<select id="isEmailExists" parameterType="String" resultType="boolean">
+		SELECT COUNT(*) > 0 FROM USERS
+		WHERE EMAIL = #{email}
 	</select>
 	
 </mapper>

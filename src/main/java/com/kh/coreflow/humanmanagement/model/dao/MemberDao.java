@@ -1,6 +1,5 @@
 package com.kh.coreflow.humanmanagement.model.dao;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,9 +7,9 @@ import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Department;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.DepartmentLite;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberLite;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPatch;
-import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberPost;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.MemberResponse;
 import com.kh.coreflow.humanmanagement.model.dto.MemberDto.Position;
+import com.kh.coreflow.model.dto.UserDto.User;
 
 public interface MemberDao {
 
@@ -22,17 +21,19 @@ public interface MemberDao {
 
 	List<MemberResponse> memberList(Map<String, String> searchParams);
 
-	MemberResponse memberDetail(int userNo);
+	MemberResponse memberDetail(Long userNo);
 
-	int memberInsert(MemberPost member);
+	int memberInsert(User user);
 	
 	int memberUpdate(MemberPatch member);
+
+	int memberDelete(Long userNo);
 	
-	int memberDelete(int userNo);
+	Long findDepId(String depName);
+
+	Long findPodId(String posName);
 
 	List<MemberLite> searchMembers(String query, Integer limit, Long depId);
 
 	List<DepartmentLite> findAll();
-
-	
 }

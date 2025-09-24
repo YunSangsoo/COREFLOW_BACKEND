@@ -17,7 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.kh.coreflow.calendar.model.dto.CalendarDto;
 import com.kh.coreflow.calendar.model.service.CalendarService;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 import com.kh.coreflow.security.CustomUserDetails;
 
 import jakarta.validation.Valid;
@@ -38,7 +38,7 @@ public class CalendarController {
 
     @GetMapping("/visible")
     public ResponseEntity<List<CalendarDto.SummaryRes>> getVisible(
-            @AuthenticationPrincipal UserDeptcode me
+            @AuthenticationPrincipal UserDeptPoscode me
     ) {
         if (me == null) return ResponseEntity.status(401).build();
         return ResponseEntity.ok(calendarService.getVisibleCalendars(me.getUserNo()));
@@ -51,7 +51,7 @@ public class CalendarController {
 
     @PostMapping
     public ResponseEntity<CalIdResponse> createCalendar(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @Valid @RequestBody CalendarDto.CreateReq req
     ) {
         if (me == null) return ResponseEntity.status(401).build();
@@ -72,7 +72,7 @@ public class CalendarController {
 
     @PutMapping("/{calId}")
     public ResponseEntity<Void> updateCalendar(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long calId,
             @Valid @RequestBody CalendarDto.UpdateReq req
     ) {
@@ -83,7 +83,7 @@ public class CalendarController {
 
     @DeleteMapping("/{calId}")
     public ResponseEntity<Void> deleteCalendar(
-            @AuthenticationPrincipal UserDeptcode me,
+            @AuthenticationPrincipal UserDeptPoscode me,
             @PathVariable Long calId
     ) {
         if (me == null) return ResponseEntity.status(401).build();

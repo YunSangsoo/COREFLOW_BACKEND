@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 import com.kh.coreflow.security.model.provider.JWTProvider;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -47,18 +47,21 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 				    .collect(Collectors.toList());
 			// 4) 권한에서 부서코드 추출
 			Long depId = jwt.getDeptcode(token);
+			// 5) 권한에서 직위코드 추출
+			Long posId = jwt.getPoscode(token);
 			
-			UserDeptcode principal =  UserDeptcode.builder()
+			UserDeptPoscode principal =  UserDeptPoscode.builder()
 			        .userNo(userNo)
 			        .depId(depId)
+			        .posId(posId)
 			        .build();
 			
 			UsernamePasswordAuthenticationToken authToken // UsernamePasswordAuthenticationToken에 적용
 		    	= new UsernamePasswordAuthenticationToken(principal, null, authorities);
-			SecurityContextHolder.getContext().setAuthentication(authToken);
 			
 			// 인증처리 끝
 			SecurityContextHolder.getContext().setAuthentication(authToken);
+			
 			}catch (ExpiredJwtException e) {
 				SecurityContextHolder.clearContext();
 				response.sendError(HttpServletResponse.SC_UNAUTHORIZED); // 401상태

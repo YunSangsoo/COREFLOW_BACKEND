@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="chat">
 
-
 	<select id="getMyProfile" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatProfile">
 		SELECT A.USER_NO, B.USER_NAME, C.STATUS_NAME AS STATUS FROM 
 		CHAT_PROFILE A INNER JOIN MEMBER B
@@ -73,12 +72,13 @@
 		ON A.ROOM_ID = B.ROOM_ID
 		WHERE B.ROOM_TYPE = #{type}
 	</select>
-	
-	<select id="openChat" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
-		SELECT * FROM CHAT_ROOMS
-		WHERE ROOM_ID=#{roomId}
+    
+	<select id="getRoom" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
+		SELECT DISTINCT *
+	    FROM CHAT_ROOMS
+		WHERE ROOM_ID = #{roomId}
 	</select>
-	
+    
 	<insert id="makeChatRoom" parameterType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms" useGeneratedKeys="true"  keyProperty="roomId" keyColumn="ROOM_ID">
 		INSERT INTO CHAT_ROOMS (
 			USER_NO, ROOM_NAME, ROOM_TYPE
@@ -130,7 +130,7 @@
             FROM CHAT_MESSAGES CM
             WHERE CM.ROOM_ID = CRJ.ROOM_ID
             AND CM.SENT_AT > CRJ.LAST_READ_AT
-        ) AS UNREAD_COUNT
+        ) AS UNREAD_COUNT, CRJ.ALARM, CRJ.HIGHLIGHT
     FROM CHAT_ROOMS CR
     JOIN CHAT_ROOM_JOIN CRJ
     ON CR.ROOM_ID = CRJ.ROOM_ID
@@ -173,12 +173,6 @@
 		MEMBER WHERE USER_NO = #{userNo}
 	</select>
 	
-	<select id="getRoom" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">
-		SELECT DISTINCT *
-	    FROM CHAT_ROOMS
-		WHERE ROOM_ID = #{roomId}
-	</select>
-	
 	
 	<select id="getCountMessageSubscribe" parameterType="map" resultType="Integer">
 		SELECT COUNT(*)
@@ -195,6 +189,7 @@
 			INNER JOIN CHAT_ROOM_JOIN B
 			ON A.USER_NO = B.USER_NO
 		WHERE ROOM_ID = #{roomId}
+		AND B.ALARM = 'T'
 	</select>
 	
 	<update id="updateLastReadAt" parameterType="map">
@@ -267,8 +262,15 @@
 	</update>
 	
 	<delete id="leaveRoom" parameterType="map">
-	DELETE FROM CHAT_ROOM_JOIN
-	WHERE USER_NO = #{userNo} AND
-	ROOM_ID = #{roomId}
+		DELETE FROM CHAT_ROOM_JOIN
+		WHERE USER_NO = #{userNo} AND
+		ROOM_ID = #{roomId}
 	</delete>
+	
+	<update id="alarmChange" useGeneratedKeys="true" keyProperty="alarm" keyColumn="ALARM">
+	UPDATE CHAT_ROOM_JOIN
+		SET ALARM = #{alarm}
+		WHERE USER_NO = #{userNo} AND
+		ROOM_ID = #{roomId}
+	</update>
 </mapper>

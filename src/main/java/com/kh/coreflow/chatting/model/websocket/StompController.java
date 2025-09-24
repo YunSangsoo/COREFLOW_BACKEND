@@ -18,7 +18,7 @@ import com.kh.coreflow.chatting.model.service.ChattingService;
 import com.kh.coreflow.common.model.service.FileService;
 import com.kh.coreflow.common.model.vo.FileDto.customFile;
 import com.kh.coreflow.model.dto.UserDto.User;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 import com.kh.coreflow.security.model.provider.JWTProvider;
 import com.kh.coreflow.security.model.service.AuthService;
 
@@ -73,7 +73,7 @@ public class StompController {
             Authentication auth,
             chatMessages message
     ) {
-    	Long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+    	Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
     	message.setUserNo(userNo);
     	User user = authService.findUserByUserNo(userNo).get();
     	message.setUserName(user.getUserName());
@@ -118,7 +118,7 @@ public class StompController {
             Authentication auth,
             chatMessages message
     ) {
-    	Long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+    	Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
     	message.setUserNo(userNo);
     	User user = authService.findUserByUserNo(userNo).get();
     	message.setUserName(user.getUserName());
@@ -152,4 +152,7 @@ public class StompController {
     		return null;
     	}
     }
+    
+    
+    
 }

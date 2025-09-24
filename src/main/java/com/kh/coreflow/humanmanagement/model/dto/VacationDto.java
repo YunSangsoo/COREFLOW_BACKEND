@@ -21,7 +21,7 @@ public class VacationDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class MemberChoice{
-		private int userNo;
+		private Long userNo;
 		private String userName;
 		private String depName;
 		private String posName;
@@ -32,9 +32,9 @@ public class VacationDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class MemberVacation{
-		private int userNo;
+		private Long userNo;
 		private String userName;
-		private int vacId;
+		private Long vacId;
 		private String vacName;
 		private Date vacStart;
 		private Date vacEnd;
@@ -46,7 +46,7 @@ public class VacationDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class PutVacStatus{
-		private int vacId;
+		private Long vacId;
 		private int status;
 	}
 	
@@ -54,7 +54,7 @@ public class VacationDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class LoginUser{
-		private int userNo;
+		private Long userNo;
 		private String userName;
 		private String depName;
 		private String posName;
@@ -65,7 +65,7 @@ public class VacationDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class VacType{
-		private int vacCode;
+		private Long vacCode;
 		private String vacName;
 	}
 	
@@ -73,7 +73,7 @@ public class VacationDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class PutVacation{
-		private int vacCode;
+		private Long vacCode;
 		private Date vacStart;
 		private Date vacEnd;
 		private float vacAmount;

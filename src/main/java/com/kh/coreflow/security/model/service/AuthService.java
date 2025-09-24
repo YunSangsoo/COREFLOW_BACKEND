@@ -21,6 +21,8 @@ public interface AuthService {
 
 	Optional<User> findUserByEmail(String email);
 
+	String createTempPwd();
+
 	
 	
 }

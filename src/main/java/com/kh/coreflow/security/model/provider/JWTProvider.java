@@ -1,7 +1,6 @@
 package com.kh.coreflow.security.model.provider;
 
 import java.security.Key;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -39,12 +38,13 @@ public class JWTProvider {
 		this.refreshKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretBase64));
 	}
 
-	public String createAccessToken(Long userNo, Long depId, List<String> roles, int minutes) {
+	public String createAccessToken(Long userNo, Long depId, Long posId, List<String> roles, int minutes) {
 		Date now = new Date();
 		return Jwts.builder()
 				.setSubject(String.valueOf(userNo)) // 페이로드에 저장할 id
 				.claim("roles", roles)
 				.claim("depId", depId)
+				.claim("posId", posId)
 				.setIssuedAt(now) // 토큰 발행시간
 				.setExpiration(new Date(now.getTime()+(1000L * 60 * minutes)))
 				.signWith(key, SignatureAlgorithm.HS256) // 서명에 사용할 키값과, 알고리즘
@@ -107,7 +107,32 @@ public class JWTProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-		return claims.get("depId", Long.class);
+		
+		return getLongValue(claims.get("depId"));
+	}
+	
+	public Long getPoscode(String token) {
+		Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+		
+		return getLongValue(claims.get("posId"));
+	}
+	
+	private int getIntValue(Object obj) {
+	    if (obj == null) return 0; // 기본값
+	    if (obj instanceof Integer i) return i;
+	    if (obj instanceof Long l) return l.intValue();
+	    return Integer.parseInt(obj.toString());
+	}
+
+	private long getLongValue(Object obj) {
+	    if (obj == null) return 0L;
+	    if (obj instanceof Long l) return l;
+	    if (obj instanceof Integer i) return i.longValue();
+	    return Long.parseLong(obj.toString());
 	}
 	
 	public boolean validateToken(String token) {
@@ -131,8 +156,11 @@ public class JWTProvider {
 		Claims claims = getClaims(accessToken);
 		// 클레임에서 userNo 추출
 		long userNo = Long.parseLong(claims.getSubject());
-		// 권한 정보 생성 (여기서는 "ROLE_USER"로 고정, 필요시 DB에서 조회)
-		List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+		// 권한 정보 생성
+		List<String> roles = getRoles(accessToken);
+		List<SimpleGrantedAuthority> authorities = roles.stream()
+														.map(SimpleGrantedAuthority::new)
+														.toList();
 		// UsernamePasswordAuthenticationToken을 만들어 반환
 		return new UsernamePasswordAuthenticationToken(userNo, null, authorities);
 	}

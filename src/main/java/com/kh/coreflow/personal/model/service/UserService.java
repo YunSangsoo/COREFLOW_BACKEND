@@ -17,8 +17,5 @@ public interface UserService {
 	void updatePhone(Long userNo, String string);
 
 	void updateAddress(Long userNo, String string, String string2);
-
-	String updateProfileImage(Long userNo, MultipartFile file);
-	
 	
 }

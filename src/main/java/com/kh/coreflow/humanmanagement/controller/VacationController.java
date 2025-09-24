@@ -24,7 +24,7 @@ import com.kh.coreflow.humanmanagement.model.dto.VacationDto.PutVacation;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacType;
 import com.kh.coreflow.humanmanagement.model.dto.VacationDto.VacationInfo;
 import com.kh.coreflow.humanmanagement.model.service.VacationService;
-import com.kh.coreflow.model.dto.UserDto.UserDeptcode;
+import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -138,7 +138,7 @@ public class VacationController {
 	public ResponseEntity<LoginUser> loginUserProfile(
 			Authentication auth
 			){
-		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		LoginUser loginUser = service.loginUserProfile(userNo);
 
 		if(loginUser != null) {
@@ -155,7 +155,7 @@ public class VacationController {
 			Authentication auth,
 			@RequestParam int year
 			){
-		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 		
 		Map<String, Object> params = new HashMap<>();
 		params.put("userNo", userNo);
@@ -191,7 +191,7 @@ public class VacationController {
 			Authentication auth,
 			@RequestBody PutVacation putVacation
 			){
-		long userNo = ((UserDeptcode)auth.getPrincipal()).getUserNo();
+		long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
 				
 		Map<String, Object> params = new HashMap<>();
 		params.put("userNo", userNo);

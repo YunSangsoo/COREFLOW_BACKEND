@@ -26,7 +26,7 @@ public class ChattingDto {
 
 		// 클라이언트의 메시지 유형을 관리할 속성
 		public enum MessageType{
-			ENTER, EXIT, TALK, FILE
+			ENTER, EXIT, TALK, FILE, VIDEO_CALL_INVITE
 		}
 		private MessageType type;
 		
@@ -72,6 +72,8 @@ public class ChattingDto {
 		private Long roomId;
 		private Date joinedAt;
 		private Date lastReadAt;
+		private String alarm;
+		private String highlight;
 	}
 	
 	@Data
@@ -90,6 +92,8 @@ public class ChattingDto {
 		private int unreadCount;
 		
 		private List<chatProfile> partner;
+		
+		private String alarm;
 	}
 	
 	@Data
@@ -101,4 +105,24 @@ public class ChattingDto {
 		private Long userNo;
 		private Long favoriteUserNo;
 	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class SignalMessage {
+	    private String type; // 메시지 타입 ("offer", "answer", "ice")
+	    private Long from;   // 보낸 사람의 userNo
+	    private Long to;     // 받는 사람의 userNo
+	    private Object data; // 실제 WebRTC 데이터 (SDP 또는 ICE Candidate)
+	}
+
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	@Builder
+	public static class MissedCallRequest {
+        private Long partnerNo;
+    }
+	
 }

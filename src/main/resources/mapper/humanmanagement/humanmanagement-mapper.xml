@@ -16,11 +16,25 @@
 		WHERE PARENT_ID = #{parentId}
 	</select>
 	
+	<!-- 부서 코드 조회 -->
+	<select id="findDepId" resultType="java.lang.Integer">
+		SELECT DEP_ID
+		FROM DEPARTMENT
+		WHERE DEP_NAME = #{depName}
+	</select>
+	
 	<!-- 직위 조회 -->
 	<select id="posiList" resultType="com.kh.coreflow.humanmanagement.model.dto.MemberDto$Position">
 		SELECT *
 		FROM POSITIONS
 		ORDER BY POS_ID ASC
+	</select>
+	
+	<!-- 직위코드 조회 -->
+	<select id="findPodId" resultType="int">
+		SELECT POS_ID
+		FROM POSITIONS
+		WHERE POS_NAME = #{posName}
 	</select>
 	
 	<!-- 사원 조회 -->
@@ -85,26 +99,14 @@
 	</select>
 	
 	<!-- 사원 등록 -->
-	<insert id="memberInsert">
-		<selectKey keyProperty="userNo" resultType="int" order="BEFORE">
-			SELECT SEQ_USER_NO.NEXTVAL FROM DUAL
-		</selectKey>
-		INSERT INTO MEMBER (USER_NO, DEP_ID, POS_ID, EMAIL, USER_NAME, PHONE, ADDRESS, ADDRESS_DETAIL, EXTENSION, UPDATE_DATE)
-		SELECT
-			#{userNo},
-			D.DEP_ID,
-			P.POS_ID,
-			#{email},
-			#{userName},
-			#{phone},
-			#{address},
-			#{addressDetail},
-			#{extension},
-			#{updateDate}
-		FROM DEPARTMENT D
-		JOIN POSITIONS P
-		WHERE D.DEP_NAME = #{depName} AND
-			  P.POS_NAME = #{posName}
+	<insert id="memberInsert" parameterType="com.kh.coreflow.model.dto.UserDto$User">
+		INSERT INTO MEMBER (
+			DEP_ID, POS_ID, EMAIL, USER_NAME, USER_PWD, PHONE, 
+			ADDRESS, ADDRESS_DETAIL, EXTENSION, HIRE_DATE, UPDATE_DATE, STATUS)
+		VALUES (
+			#{depId}, #{posId}, #{email}, #{userName}, #{userPwd}, #{phone},
+			#{address}, #{addressDetail}, #{extension}, #{hireDate}, SYSDATE, #{status}
+		)
 	</insert>
 	
 	<!-- 사원 정보 수정 -->
@@ -174,6 +176,4 @@
     FROM DEPARTMENT
     ORDER BY DEP_NAME ASC
   </select>
-
-
 </mapper>

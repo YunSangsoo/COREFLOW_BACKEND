@@ -34,6 +34,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
         // "/app"으로 시작하는 목적지를 가진 메시지를 @MessageMapping 어노테이션이 붙은 메소드로 라우팅
         // 클라이언트가 서버로 메시지를 보낼 때 사용하는 접두사
         registry.setApplicationDestinationPrefixes("/app");
+        
+        registry.setUserDestinationPrefix("/user");
     }
     
     // 클라이언트의 인바운드 메시지를 처리하는 채널에 인터셉터를 등록합니다.
