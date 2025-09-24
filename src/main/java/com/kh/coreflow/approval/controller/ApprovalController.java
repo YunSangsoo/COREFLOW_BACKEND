@@ -36,10 +36,9 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-// 결재 처리 요청을 받기 위한 DTO
 @Data
 class ApprovalRequest {
-    private String action; // "APPROVE" 또는 "REJECT"
+    private String action; 
 }
 
 @RestController
@@ -108,9 +107,9 @@ public class ApprovalController {
     @GetMapping("/my-documents")
     public ResponseEntity<List<ApprovalDto>> getDocuments(
             Principal principal,
-            @RequestParam(value = "keyword", required = false) String keyword) { // [수정] keyword 파라미터 추가
+            @RequestParam(value = "keyword", required = false) String keyword) { 
         int userNo = getUserNoFromPrincipal(principal);
-        List<ApprovalDto> documents = service.getDocumentsByUser(userNo, keyword); // [수정] keyword 전달
+        List<ApprovalDto> documents = service.getDocumentsByUser(userNo, keyword); 
         return ResponseEntity.ok(documents);
     }
     //결재
@@ -163,9 +162,9 @@ public class ApprovalController {
     @GetMapping("/received-documents")
     public ResponseEntity<List<ApprovalDto>> getReceivedDocuments(
             Principal principal,
-            @RequestParam(value = "keyword", required = false) String keyword) { // [수정] keyword 파라미터 추가
+            @RequestParam(value = "keyword", required = false) String keyword) { 
         int userNo = getUserNoFromPrincipal(principal);
-        List<ApprovalDto> documents = service.getReceivedDocumentsByUser(userNo, keyword); // [수정] keyword 전달
+        List<ApprovalDto> documents = service.getReceivedDocumentsByUser(userNo, keyword); 
         return ResponseEntity.ok(documents);
     }
     
@@ -173,9 +172,9 @@ public class ApprovalController {
     @GetMapping("/processed-documents")
     public ResponseEntity<List<ApprovalDto>> getProcessedDocuments(
             Principal principal,
-            @RequestParam(value = "keyword", required = false) String keyword){ // [수정] keyword 파라미터 추가
+            @RequestParam(value = "keyword", required = false) String keyword){ 
     	int userNo = getUserNoFromPrincipal(principal);
-    	List<ApprovalDto> documents = service.getProcessedDocumentsByUser(userNo, keyword); // [수정] keyword 전달
+    	List<ApprovalDto> documents = service.getProcessedDocumentsByUser(userNo, keyword); 
     	return ResponseEntity.ok(documents);
     }
     
@@ -183,9 +182,9 @@ public class ApprovalController {
     @GetMapping("/cc-documents")
     public ResponseEntity<List<ApprovalDto>> getCcDocuments(
             Principal principal,
-            @RequestParam(value = "keyword", required = false) String keyword){ // [수정] keyword 파라미터 추가
+            @RequestParam(value = "keyword", required = false) String keyword){
     	int userNo = getUserNoFromPrincipal(principal);
-    	List<ApprovalDto> documents = service.getCcDocumentsByUser(userNo, keyword); // [수정] keyword 전달
+    	List<ApprovalDto> documents = service.getCcDocumentsByUser(userNo, keyword);
     	return ResponseEntity.ok(documents);
     }
     

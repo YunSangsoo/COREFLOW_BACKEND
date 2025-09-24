@@ -115,11 +115,11 @@ public class MemberServiceImpl implements MemberService{
 
 	@Override
 	public List<MemberLite> search(String query, Integer limit, Long depId) {
-		return null;
+        return dao.searchMembers(query, limit, depId);
 	}
 
 	@Override
 	public List<DepartmentLite> findAll() {
-		return null;
+        return dao.findAll();
 	}
 }

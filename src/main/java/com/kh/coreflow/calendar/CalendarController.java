@@ -2,6 +2,7 @@ package com.kh.coreflow.calendar;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -89,5 +91,49 @@ public class CalendarController {
         if (me == null) return ResponseEntity.status(401).build();
         calendarService.deleteCalendar(me.getUserNo(), calId);
         return ResponseEntity.noContent().build(); // 204
+    }
+    
+    @GetMapping("/{calId}/shares")
+    public ResponseEntity<CalendarDto.ShareListRes> getShares(
+            @AuthenticationPrincipal(expression = "userNo") Long userNo, // ← 핵심
+            @PathVariable Long calId
+    ) {
+        if (userNo == null) return ResponseEntity.status(401).build();
+        CalendarDto.ShareListRes res = calendarService.getCalendarShares(calId, userNo);
+        return ResponseEntity.ok(res);
+    }
+
+    @PutMapping("/{calId}/shares")
+    public ResponseEntity<Void> putShares(
+            @AuthenticationPrincipal(expression = "userNo") Long userNo, // ← 이 한 줄이면 충분
+            @PathVariable Long calId,
+            @RequestParam(name = "mode", defaultValue = "merge") String mode,
+            @Valid @RequestBody CalendarDto.ShareUpsertReq req
+    ) {
+        if (userNo == null) return ResponseEntity.status(401).build();
+        calendarService.applyCalendarShares(calId, userNo, mode, req);
+        return ResponseEntity.noContent().build();
+    }
+    
+ // 조직: 부서 트리
+    @GetMapping("/org/departments/tree")
+    public ResponseEntity<List<Map<String, Object>>> getDepartments(@RequestParam(required=false) Long parentId) {
+        return ResponseEntity.ok(calendarService.getDepartments(parentId));
+    }
+
+    // 조직: 직급 목록
+    @GetMapping("/org/positions")
+    public ResponseEntity<List<Map<String, Object>>> getPositions() {
+        return ResponseEntity.ok(calendarService.getPositions());
+    }
+
+    // 멤버 검색
+    @GetMapping("/members")
+    public ResponseEntity<List<Map<String, Object>>> searchMembers(
+            @RequestParam(required=false) String query,
+            @RequestParam(required=false) Integer limit,
+            @RequestParam(required=false) Long depId
+    ) {
+        return ResponseEntity.ok(calendarService.findMembers(query, limit, depId));
     }
 }
