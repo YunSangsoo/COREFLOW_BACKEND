@@ -69,7 +69,7 @@ public class SecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 		
 		// 허용 Origin설정
-		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
+		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000", "http://3.37.61.74"));
 		
 		// 허용 메서드
 		config.setAllowedMethods(List.of("GET","POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
