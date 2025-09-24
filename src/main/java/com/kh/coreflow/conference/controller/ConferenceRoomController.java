@@ -24,9 +24,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -300,4 +302,49 @@ public class ConferenceRoomController {
         if (me == null) return ResponseEntity.status(401).build();
         return ResponseEntity.ok(service.attachEvent(resvId, req.getEventId(), me.getUserNo()));
     }
+    
+    /**
+     * 회의실 상세 + 기간 내 예약현황
+     * GET /conference-rooms/{roomId}/detail?from=YYYY-MM-DD HH:mm:ss&to=YYYY-MM-DD HH:mm:ss
+     */
+
+    @GetMapping("/{roomId}/detail")
+    public ResponseEntity<ConferenceRoomDto.RoomDetailRes> getDetail(
+            @AuthenticationPrincipal UserDeptPoscode me,
+            @PathVariable Long roomId,
+            @RequestParam String from,
+            @RequestParam String to
+    ) {
+        if (me == null) return ResponseEntity.status(401).build();
+
+        ConferenceRoomDto.RoomDetailRes res =
+                service.getRoomDetail(me.getUserNo(), roomId, from, to);
+
+        if (res == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(res);
+    }
+    
+    @PreAuthorize("hasAnyRole('HR','ADMIN')")
+    @PutMapping("/{roomId}")
+    public ResponseEntity<Void> update(
+            @AuthenticationPrincipal UserDeptPoscode me,
+            @PathVariable Long roomId,
+            @RequestBody ConferenceRoomDto.CreateReq req   // UpdateReq가 따로 없으면 CreateReq 재사용
+    ) {
+        if (me == null) return ResponseEntity.status(401).build();
+        service.updateRoom(roomId, req, me.getUserNo());
+        return ResponseEntity.noContent().build(); // 204
+    }
+    
+    @PreAuthorize("hasAnyRole('HR','ADMIN')")
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Void> delete(
+            @AuthenticationPrincipal UserDeptPoscode me,
+            @PathVariable Long roomId
+    ) {
+        if (me == null) return ResponseEntity.status(401).build();
+        service.deleteRoom(roomId, me.getUserNo());
+        return ResponseEntity.noContent().build(); // 204
+    }
 }
+
