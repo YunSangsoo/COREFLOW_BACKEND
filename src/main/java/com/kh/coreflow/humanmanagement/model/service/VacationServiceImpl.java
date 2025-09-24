@@ -78,7 +78,6 @@ public class VacationServiceImpl implements VacationService{
 		LocalDate YearOfEmployment = user.getHireDate()
 				.toInstant().atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
 		int experience = (Integer)params.get("year") - YearOfEmployment.getYear();
-		System.out.println("experience = " + experience);
 		
 		params.put("experience", experience);
 		int availableVac = dao.availableVac(params); // 사용 가능 휴가 조회
