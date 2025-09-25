@@ -17,7 +17,7 @@ import com.kh.coreflow.security.CustomUserDetails;
 import com.kh.coreflow.security.model.service.AuthService;
 
 @Controller
-@RequestMapping("/mypage")
+@RequestMapping("/api/mypage")
 public class PersonalController {
 
 	private final AuthService authService;

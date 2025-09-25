@@ -44,7 +44,7 @@ class ApprovalRequest {
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/approvals")
+@RequestMapping("/api/approvals")
 @Tag(name = "Approval API", description = "")
 public class ApprovalController {
 

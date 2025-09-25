@@ -36,7 +36,7 @@ public class FileController {
 	@Autowired
 	FileService service;
 	
-	@GetMapping("/download/{imageCode}/{changeName}")
+	@GetMapping("/api/download/{imageCode}/{changeName}")
     public ResponseEntity<Resource> downloadFile(
             @PathVariable String imageCode, 
             @PathVariable String changeName) throws MalformedURLException {

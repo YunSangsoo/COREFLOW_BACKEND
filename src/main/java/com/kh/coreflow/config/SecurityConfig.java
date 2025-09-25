@@ -52,13 +52,13 @@ public class SecurityConfig {
 							management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 					.authorizeHttpRequests(auth
 						-> auth
-						.requestMatchers("/vacation/member/**","/attendance/member/**").hasAnyRole("ADMIN","HR")
-						.requestMatchers("/auth/login/**","/auth/find-pwd/**","/auth/logout/**","/auth/refresh/**").permitAll()
-						.requestMatchers("/login**","/error").permitAll()
+						.requestMatchers("/api/vacation/member/**","/api/attendance/member/**").hasAnyRole("ADMIN","HR")
+						.requestMatchers("/api/auth/login/**","/api/auth/find-pwd/**","/api/auth/logout/**","/api/auth/refresh/**").permitAll()
+						.requestMatchers("/api/login**","/api/error").permitAll()
 						.requestMatchers("/api/approvals/documents").permitAll()
-						.requestMatchers("/images/**","/download/**").permitAll()
-						.requestMatchers("/ws/**").permitAll()
-						.requestMatchers("/**").authenticated()
+						.requestMatchers("/api/images/**","/api/download/**").permitAll()
+						.requestMatchers("/api/ws/**").permitAll()
+						.requestMatchers("/api/**").authenticated()
 					);
 		http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 		
@@ -69,7 +69,7 @@ public class SecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 		
 		// 허용 Origin설정
-		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000", "http://3.37.61.74"));
+		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000", "https://coreflow.duckdns.org"));
 		
 		// 허용 메서드
 		config.setAllowedMethods(List.of("GET","POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/cpolicies")
+@RequestMapping("/api/cpolicies")
 @Tag(name="Company Policy API", description="회사 규정 API")
 public class CompanyPolicyController {
 	private final CompanyPolicyService service;

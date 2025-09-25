@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /** 최종 URL: /api/events/... */
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/api/events")
 @RequiredArgsConstructor
 @Slf4j
 public class EventController {

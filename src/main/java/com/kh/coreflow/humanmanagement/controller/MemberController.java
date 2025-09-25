@@ -37,7 +37,7 @@ public class MemberController {
 	
 	// 부모 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/departments")
+	@GetMapping("/api/departments")
 	public ResponseEntity<List<Department>> deptList(){
 		List<Department> deptList = service.deptList();
 		

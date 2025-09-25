@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/ai")
+@RequestMapping("/api/ai")
 @Tag(name="CoreFlow AI API", description="CoreFlow AI API")
 public class AiController {
 	private final AiService service;

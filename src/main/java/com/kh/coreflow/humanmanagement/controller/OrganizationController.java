@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/organization")
+@RequestMapping("/api/organization")
 public class OrganizationController {
 	private final OrganizationService service;
 	

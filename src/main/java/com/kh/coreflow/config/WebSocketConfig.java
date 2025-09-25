@@ -22,7 +22,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 클라이언트가 WebSocket 연결을 시작할 엔드포인트를 지정
         // SockJS는 WebSocket을 지원하지 않는 브라우저를 위한 대체 옵션
-        registry.addEndpoint("/ws").setAllowedOriginPatterns("http://localhost:5173").withSockJS();
+		registry.addEndpoint("/api/ws").setAllowedOriginPatterns("https://coreflow.duckdns.org", "http://localhost:5173").withSockJS();
     }
 
     @Override
@@ -33,7 +33,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
         // "/app"으로 시작하는 목적지를 가진 메시지를 @MessageMapping 어노테이션이 붙은 메소드로 라우팅
         // 클라이언트가 서버로 메시지를 보낼 때 사용하는 접두사
-        registry.setApplicationDestinationPrefixes("/app");
+        registry.setApplicationDestinationPrefixes("/api");
         
         registry.setUserDestinationPrefix("/user");
     }

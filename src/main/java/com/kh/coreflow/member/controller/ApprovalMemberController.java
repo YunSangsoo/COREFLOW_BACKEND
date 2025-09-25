@@ -13,7 +13,7 @@ import com.kh.coreflow.member.model.dto.DepartmentDto;
 import com.kh.coreflow.member.service.ApprovalMemberService;
 
 @RestController
-@RequestMapping("/apporval-membrs")
+@RequestMapping("/api/apporval-membrs")
 public class ApprovalMemberController {
 
 	private final ApprovalMemberService memberService;

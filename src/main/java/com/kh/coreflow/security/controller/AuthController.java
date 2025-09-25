@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
 public class AuthController {
@@ -58,7 +58,6 @@ public class AuthController {
 		
 		//1) 사용자가 존재하느지 확인
 		boolean exists = service.existsByEmail(req.getEmail());
-		
 		if(!exists) {
 			return ResponseEntity.notFound().build();
 		}

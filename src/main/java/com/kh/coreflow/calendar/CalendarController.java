@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /** 최종 URL: /api/calendars/... (server.servlet.context-path=/api) */
 @RestController
-@RequestMapping("/calendar")
+@RequestMapping("/api/calendar")
 @RequiredArgsConstructor
 @Slf4j
 public class CalendarController {

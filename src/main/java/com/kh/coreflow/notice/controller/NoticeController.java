@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/notice")
+@RequestMapping("/api/notice")
 public class NoticeController {
 	
 	private final NoticeService service;

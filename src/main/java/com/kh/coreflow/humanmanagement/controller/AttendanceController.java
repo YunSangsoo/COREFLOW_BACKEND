@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/attendance")
+@RequestMapping("/api/attendance")
 public class AttendanceController {
 	private final AttendanceService service;
 	

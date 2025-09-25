@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/chatting")
+@RequestMapping("/api/chatting")
 @RestController
 public class ChattingController {
 	

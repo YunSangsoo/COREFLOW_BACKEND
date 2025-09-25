@@ -33,6 +33,22 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
+		
+		// 요청 경로를 가져옴
+        String requestURI = request.getRequestURI();
+
+        // ✅ 로그인, 회원가입, 토큰 재발급 등의 인증 관련 경로는 필터를 건너뛰도록 설정
+        if (requestURI.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // ✅ 웹소켓 연결 경로도 필터를 건너뛰도록 설정
+        if (requestURI.startsWith("/ws")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+		
 		// 1) 요청 header에서 Authorization 추출
 		String header = request.getHeader("Authorization");
 		if(header != null && header.startsWith("Bearer ")) {
