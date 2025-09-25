@@ -111,16 +111,16 @@
     )
 	</insert>
 	
-	<select id="getMessages" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages">
+	<select id="getMessages" parameterType="map" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatMessages">
 	SELECT A.*, B.USER_NAME FROM 
 		CHAT_MESSAGES A INNER JOIN MEMBER B
 		ON A.USER_NO = B.USER_NO
 		INNER JOIN CHAT_ROOM_JOIN C
 		ON A.ROOM_ID = C.ROOM_ID
-        AND A.USER_NO = C.USER_NO
+        AND C.USER_NO = #{userNo}
 		WHERE A.ROOM_ID = #{roomId}
 		AND A.SENT_AT>=C.JOINED_AT
-		ORDER BY A.SENT_AT
+	ORDER BY A.SENT_AT
 	</select>
 	
 	<select id="getMyChattingRooms" resultType="com.kh.coreflow.chatting.model.dto.ChattingDto$chatRooms">

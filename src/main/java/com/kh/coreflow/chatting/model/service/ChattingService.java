@@ -25,7 +25,7 @@ public interface ChattingService {
 
 	int insertMessage(chatMessages message);
 
-	List<chatMessages> getMessages(Long roomId);
+	List<chatMessages> getMessages(Long roomId, Long userNo);
 
 	List<chatRooms> getmyChattingRooms(Long userNo);
 

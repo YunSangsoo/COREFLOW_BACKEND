@@ -2,6 +2,11 @@ package com.kh.coreflow.conference.service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +21,6 @@ import com.kh.coreflow.conference.dao.ConferenceRoomDao;
 import com.kh.coreflow.conference.model.dto.ConferenceRoomDto;
 import com.kh.coreflow.conference.model.dto.ConferenceRoomDto.AvailabilityRes;
 import com.kh.coreflow.conference.model.dto.ConferenceRoomDto.CreateReq;
-import com.kh.coreflow.conference.model.dto.ConferenceRoomDto.ReservationCreateReq;
 import com.kh.coreflow.conference.model.dto.ConferenceRoomDto.ReservationRes;
 import com.kh.coreflow.conference.model.dto.ConferenceRoomDto.ReservationStatus;
 import com.kh.coreflow.conference.model.dto.ConferenceRoomDto.ReservationTimeUpdateReq;
@@ -196,6 +200,80 @@ public class ConferenceRoomServiceImpl implements ConferenceRoomService{
         p.put("buildingName", buildingName);
         p.put("floor", floor);
         return dao.selectAvailability(p);
+    }
+    
+    private static final DateTimeFormatter SPACE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private static LocalDateTime parseFlexible(String v) {
+        if (v == null) throw new DateTimeParseException("null", "null", 0);
+        String s = v.trim();
+        // 1) 'yyyy-MM-dd HH:mm:ss'
+        try { return LocalDateTime.parse(s, SPACE_FMT); } catch (Exception ignore) {}
+        // 2) ISO_LOCAL_DATE_TIME
+        try { return LocalDateTime.parse(s); } catch (Exception ignore) {}
+        // 3) 'yyyy-MM-dd'만 온 경우 00:00:00 보정
+        if (s.length() == 10) return LocalDateTime.parse(s + " 00:00:00", SPACE_FMT);
+        // 4) OffsetDateTime, Instant 등
+        try { return OffsetDateTime.parse(s).toLocalDateTime(); } catch (Exception ignore) {}
+        try { return Instant.parse(s).atZone(ZoneId.systemDefault()).toLocalDateTime(); } catch (Exception ignore) {}
+        throw new DateTimeParseException("Unparseable datetime: " + v, v, 0);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ConferenceRoomDto.RoomDetailRes getRoomDetail(Long actorUserNo, Long roomId, String fromStr, String toStr) {
+        // 1) 회의실 요약(상세 조립용)
+        ConferenceRoomDto.Room room = dao.selectRoomByIdForDetail(roomId);
+        if (room == null) return null;
+
+        // 2) 기간 파싱
+        LocalDateTime fromLdt = parseFlexible(fromStr);
+        LocalDateTime toLdt   = parseFlexible(toStr);
+        Timestamp from = Timestamp.valueOf(fromLdt);
+        Timestamp to   = Timestamp.valueOf(toLdt);
+
+        // 3) 기간 내 예약(이벤트) 조회
+        List<ConferenceRoomDto.RoomReservationRes> reservations =
+                dao.selectReservationsByRoomAndPeriod(roomId, from, to);
+
+        // 4) 조립
+        return ConferenceRoomDto.RoomDetailRes.builder()
+                .roomId(room.getRoomId())
+                .roomName(room.getRoomName())
+                .location(room.getLocation())
+                .capacity(room.getCapacity())
+                .equipments(room.getEquipments())     // mapper에서 NULL 반환(컬럼 미보유시)
+                .description(room.getDescription())   // mapper에서 NULL 반환(컬럼 미보유시)
+                .reservations(reservations)
+                .build();
+    }
+    
+    @Override
+    @Transactional
+    public void updateRoom(Long roomId, ConferenceRoomDto.CreateReq req, Long userNo) {
+        int updated = dao.updateRoom(roomId, req, userNo);
+        if (updated == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "회의실을 찾을 수 없습니다.");
+        }
+    }
+    
+    @Override
+    @Transactional
+    public void deleteRoom(Long roomId, Long userNo) {
+        // 1) 이 회의실을 참조하는 ‘삭제되지 않은’ 이벤트가 있으면 삭제 금지
+        int using = dao.countActiveEventsByRoom(roomId);
+        if (using > 0) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "이 회의실과 연결된 일정이 있어 삭제할 수 없습니다."
+            );
+        }
+
+        // 2) 실제 삭제
+        int affected = dao.deleteRoom(roomId);
+        if (affected == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "회의실을 찾을 수 없습니다.");
+        }
     }
 }
 

@@ -55,12 +55,57 @@
   </select>
 
   <!-- 단건 조회 -->
-  <select id="selectRoomById" resultMap="RoomResMap" parameterType="long">
+<select id="selectRoomById"
+        parameterType="long"
+        resultType="com.kh.coreflow.conference.model.dto.ConferenceRoomDto$Res">
+  SELECT
+      r.ROOM_ID         AS roomId,
+      r.UPDATE_USER_NO  AS updateUserNo,
+      r.ROOM_NAME       AS roomName,
+      r.BUILDING_NAME   AS buildingName,
+      r.FLOOR           AS floor,
+      r.ROOM_NO         AS roomNo,
+      r.CAPACITY        AS capacity,
+      r.DETAIL_LOCATION AS detailLocation,
+      r.STATUS          AS status,
+      r.CREATE_DATE     AS createDate,
+      r.UPDATE_DATE     AS updateDate,
+      r.CREATE_USER_NO  AS createUserNo
+  FROM CONFERENCE_ROOM r
+  WHERE r.ROOM_ID = #{roomId}
+</select>
+  <select id="selectReservationsByRoomAndPeriod" parameterType="map"
+          resultType="com.kh.coreflow.conference.model.dto.ConferenceRoomDto$RoomReservationRes">
     SELECT
-      ROOM_ID, UPDATE_USER_NO, ROOM_NAME, BUILDING_NAME, FLOOR, ROOM_NO,
-      CAPACITY, DETAIL_LOCATION, STATUS, CREATE_DATE, UPDATE_DATE, CREATE_USER_NO
-    FROM CONFERENCE_ROOM
-    WHERE ROOM_ID = #{roomId}
+      e.EVENT_ID                AS eventId,
+      NVL(e.TITLE,'(제목없음)') AS title,
+      e.CAL_ID                  AS calId,
+      c.CAL_NAME                AS calendarName,
+      e.START_AT                AS startAt,
+      e.END_AT                  AS endAt,
+      e.CREATE_BY_USER_NO       AS organizerUserNo,
+      m.USER_NAME               AS organizerName
+    FROM EVENT e
+      JOIN CALENDAR c ON c.CAL_ID = e.CAL_ID
+      LEFT JOIN MEMBER m ON m.USER_NO = e.CREATE_BY_USER_NO
+    WHERE e.ROOM_ID = #{roomId}
+      AND e.STATUS = 'CONFIRMED'   
+      AND e.START_AT &lt; #{to}
+      AND e.END_AT   &gt; #{from}
+    ORDER BY e.START_AT
+  </select>
+
+  <select id="selectRoomByIdForDetail" parameterType="long"
+          resultType="com.kh.coreflow.conference.model.dto.ConferenceRoomDto$Room">
+    SELECT
+      r.ROOM_ID   AS roomId,
+      r.ROOM_NAME AS roomName,
+      NVL(r.BUILDING_NAME,'') || ' ' || NVL(r.FLOOR,'') || ' ' || NVL(r.ROOM_NO,'') AS location,
+      r.CAPACITY  AS capacity,
+      CAST(NULL AS VARCHAR2(200))  AS equipments,
+      r.DETAIL_LOCATION AS description
+    FROM CONFERENCE_ROOM r
+    WHERE r.ROOM_ID = #{roomId}
   </select>
 
   <!-- 회의실 생성 -->
@@ -216,6 +261,33 @@
        AND STATUS       &lt;&gt; 'DELETED'
   </update>
 
+<update id="updateRoom" parameterType="map">
+  UPDATE CONFERENCE_ROOM
+     SET ROOM_NAME      = #{p.roomName}
+       , BUILDING_NAME  = #{p.buildingName}
+       , FLOOR          = #{p.floor}
+       , ROOM_NO        = #{p.roomNo}
+       , CAPACITY       = #{p.capacity, jdbcType=INTEGER}
+       , DETAIL_LOCATION= #{p.detailLocation}
+       , STATUS         = #{p.status}
+       , UPDATE_USER_NO = #{userNo}
+       , UPDATE_DATE    = SYSTIMESTAMP
+   WHERE ROOM_ID        = #{roomId}
+</update>
+
+<!-- 이 회의실을 참조하는 '삭제되지 않은' 이벤트 수 -->
+<select id="countActiveEventsByRoom" parameterType="long" resultType="int">
+  SELECT COUNT(*)
+    FROM EVENT e
+   WHERE e.ROOM_ID = #{roomId}
+     AND NVL(e.STATUS, 'CONFIRMED') &lt;&gt; 'DELETED'
+</select>
+
+<!-- 회의실 하드 삭제 -->
+<delete id="deleteRoom" parameterType="long">
+  DELETE FROM CONFERENCE_ROOM
+   WHERE ROOM_ID = #{roomId}
+</delete>
 
 </mapper>
 

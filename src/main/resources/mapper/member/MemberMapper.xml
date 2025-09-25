@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="memberMapper">
+
+<select id="findAllDepartments" resultType="com.kh.coreflow.member.model.dto.DepartmentDto">
+	SELECT DEP_ID as depId, DEP_NAME as depName FROM DEPARTMENTS
+</select>
+
+<select id="findMembers" resultType="com.kh.coreflow.member.model.dto.ApprovalMemberDto">
+	SELECT USER_NO as userNo, USER_NAME as userName, EMAIL as email, DEP_ID as depId
+	FROM MEMBERS
+	<where>
+		<if test="query != null and query != ''">
+         	(UPPER(USER_NAME) LIKE '%' || UPPER(#{query}) || '%' OR UPPER(EMAIL) LIKE '%' || UPPER(#{query}) || '%')
+		</if>
+		<if test="depId != null">
+			ANE DEP_ID = #{depId}
+		</if>
+	</where>
+	FETCH FIRST #{limit} ROWS ONLY
+</select>
+
+</mapper>
