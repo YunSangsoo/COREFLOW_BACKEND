@@ -94,12 +94,11 @@ public class NoticeController {
 	public ResponseEntity<NoticeDetail> noticeDetail(
 			@PathVariable int notiId
 			){
-		NoticeDetail notiDetail = service.notiDetail(notiId);
-
 		List<customFile> files = fileService.getFiles("N",Long.valueOf(notiId));
 		
+		NoticeDetail notiDetail = service.notiDetail(notiId);
 		notiDetail.setFiles(files);
-		
+		log.info("files : {}",files);
 		if(notiDetail != null) {
 			if(notiDetail.getParentDepId() == null) {
 				notiDetail.setParentDepId(notiDetail.getChildDepId());
@@ -119,6 +118,9 @@ public class NoticeController {
 			@ModelAttribute NoticeInsert insertParams,
 			@RequestParam(value = "files", required=false) List<MultipartFile> files
 			){
+		List<customFile> initFiles = fileService.getFiles("N", notiId);
+		insertParams.setInitFile(initFiles);
+
 		insertParams.setUserNo(auth.getUserNo());
 		insertParams.setNotiId(notiId);
 		
