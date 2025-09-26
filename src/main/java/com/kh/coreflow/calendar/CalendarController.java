@@ -136,4 +136,14 @@ public class CalendarController {
     ) {
         return ResponseEntity.ok(calendarService.findMembers(query, limit, depId));
     }
+    
+    @GetMapping("/{calId}/my-role")
+    public ResponseEntity<Map<String,String>> getMyRole(
+            @AuthenticationPrincipal(expression = "userNo") Long userNo,
+            @PathVariable Long calId
+    ) {
+        if (userNo == null) return ResponseEntity.status(401).build();
+        String role = calendarService.getMyRoleForCalendar(userNo, calId);
+        return ResponseEntity.ok(java.util.Map.of("role", role)); // { "role": "BUSY_ONLY" | ... }
+    }
 }

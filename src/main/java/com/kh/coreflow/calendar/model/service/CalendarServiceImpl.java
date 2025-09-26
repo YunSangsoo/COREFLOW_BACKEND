@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.kh.coreflow.calendar.model.dao.CalendarDao;
 import com.kh.coreflow.calendar.model.dto.CalendarDto;
@@ -71,29 +73,27 @@ public class CalendarServiceImpl implements CalendarService {
         throw new IllegalStateException("삭제 권한이 없습니다.");
     }
     
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public CalendarDto.ShareListRes getCalendarShares(Long calId, Long userNo) {
-        // 소유자만 허용
         if (!calendarDao.isCalendarOwner(userNo, calId)) {
-            throw new IllegalStateException("권한이 없습니다. (소유자만 조회 가능)");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다. (소유자만 조회 가능)");
         }
         return CalendarDto.ShareListRes.builder()
-                .users(calendarDao.selectCalendarMemberShares(calId))
-                .departments(calendarDao.selectCalendarDeptShares(calId))
-                .positions(calendarDao.selectCalendarPosShares(calId))
-                .defaultRole(calendarDao.selectCalendarDefaultRole(calId))
-                .build();
+            .users(calendarDao.selectCalendarMemberShares(calId))
+            .departments(calendarDao.selectCalendarDeptShares(calId))
+            .positions(calendarDao.selectCalendarPosShares(calId))
+            .defaultRole(calendarDao.selectCalendarDefaultRole(calId))
+            .build();
     }
 
     @org.springframework.transaction.annotation.Transactional
     @Override
     public void applyCalendarShares(Long calId, Long userNo, String mode, CalendarDto.ShareUpsertReq req) {
         // 소유자만 허용
-        if (!calendarDao.isCalendarOwner(userNo, calId)) {
-            throw new IllegalStateException("권한이 없습니다. (소유자만 변경 가능)");
+    	if (!calendarDao.isCalendarOwner(userNo, calId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다. (소유자만 변경 가능)");
         }
-
         final boolean replace = "replace".equalsIgnoreCase(mode);
 
         if (replace) {
@@ -138,5 +138,10 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public List<Map<String, Object>> findMembers(String query, Integer limit, Long depId) {
         return calendarDao.searchMembers(query, limit, depId);
+    }
+    @Override
+    public String getMyRoleForCalendar(Long userNo, Long calId) {
+        String r = calendarDao.selectEffectiveCalendarRoleForUser(userNo, calId);
+        return r == null ? "NONE" : r.toUpperCase();
     }
 }

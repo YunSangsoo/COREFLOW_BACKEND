@@ -18,4 +18,8 @@ public interface CalendarService {
     List<Map<String, Object>> getDepartments(Long parentId);
     List<Map<String, Object>> getPositions();
     List<Map<String, Object>> findMembers(String query, Integer limit, Long depId);
+    
+    String getMyRoleForCalendar(Long userNo, Long calId);
+    
+
 }
