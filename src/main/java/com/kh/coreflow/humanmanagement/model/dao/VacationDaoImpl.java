@@ -63,4 +63,9 @@ public class VacationDaoImpl implements VacationDao{
 	public int putPerVac(Map<String, Object> params) {
 		return session.insert("vacation.putPerVac",params);
 	}
+
+	@Override
+	public int availableVac(Map<String, Object> params) {
+		return session.selectOne("vacation.availableVac", params);
+	}
 }

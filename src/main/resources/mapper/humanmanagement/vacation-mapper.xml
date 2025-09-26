@@ -98,6 +98,7 @@
 	<!-- 로그인 사원 휴가 내역 조회 -->
 	<select id="perVacation" resultType="com.kh.coreflow.humanmanagement.model.dto.VacationDto$MemberVacation">
 		SELECT
+			V.VAC_ID,
 			V.USER_NO,
 			M.USER_NAME,
 			M.HIRE_DATE,
@@ -119,4 +120,11 @@
 		INSERT INTO VACATION(VAC_CODE, USER_NO, VAC_START, VAC_END, VAC_AMOUNT)
 		VALUES(#{putVacation.vacCode}, #{userNo}, #{putVacation.vacStart}, #{putVacation.vacEnd},#{putVacation.vacAmount})
 	</insert>
+	
+	<select id="availableVac" resultType="int">
+		SELECT VAC_AMOUNT
+		FROM VACATION_BASIC
+		WHERE WORK_PRD = #{experience}
+	</select>
+	
 </mapper>
