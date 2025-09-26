@@ -123,6 +123,7 @@ public class AttendanceController {
 			VacType vacType
 			){
 		List<VacType> vacTypeList = service.vacTypeList(vacType);
+		log.info("vacTypeList : {}",vacTypeList);
 		
 		if(vacTypeList != null && !vacTypeList.isEmpty()) {
 			return ResponseEntity.ok(vacTypeList);
@@ -135,7 +136,8 @@ public class AttendanceController {
 	@PatchMapping("/vacType")
 	public ResponseEntity<Void> vacationTypeUpdate(
 			@RequestBody VacTypeUpdate vacTypeUpdate
-			){		
+			){
+		log.info("vacTypeUpdate : {}",vacTypeUpdate);
 		int result = service.vacUpdate(vacTypeUpdate);
 		
 		if(result > 0) {
