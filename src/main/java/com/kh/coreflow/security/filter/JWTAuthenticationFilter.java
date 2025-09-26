@@ -37,7 +37,10 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter{
 		// 요청 경로를 가져옴
         String requestURI = request.getRequestURI();
 
-        if (requestURI.startsWith("/api/auth/") || 
+        if (requestURI.startsWith("/api/auth/login") ||  
+                requestURI.startsWith("/api/auth/find-pwd") || 
+                requestURI.startsWith("/api/auth/logout") || 
+                requestURI.startsWith("/api/auth/refresh") ||
                 requestURI.startsWith("/api/images/") || // 이미지 경로 추가!
                 requestURI.startsWith("/ws")) {
                 filterChain.doFilter(request, response);
