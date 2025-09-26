@@ -27,7 +27,7 @@ public interface MemberService {
 
 	int memberInsert(MemberPost member, MultipartFile image);
 	
-	int memberUpdate(MemberPatch member);
+	int memberUpdate(MemberPatch member, MultipartFile file);
 
 	int memberDelete(Long userNo);
 	

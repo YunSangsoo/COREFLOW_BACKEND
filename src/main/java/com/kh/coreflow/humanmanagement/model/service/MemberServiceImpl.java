@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kh.coreflow.common.model.service.FileService;
@@ -104,8 +105,13 @@ public class MemberServiceImpl implements MemberService{
 	}
 	
 	@Override
-	public int memberUpdate(MemberPatch member) {
-		return dao.memberUpdate(member);
+	@Transactional
+	public int memberUpdate(MemberPatch member, MultipartFile file) {
+		int answer = dao.memberUpdate(member);
+		if(file!=null) {
+			fileService.setOrChangeOneImage(file, member.getUserNo(), "P");
+		}
+		return answer;
 	}
 
 	@Override
