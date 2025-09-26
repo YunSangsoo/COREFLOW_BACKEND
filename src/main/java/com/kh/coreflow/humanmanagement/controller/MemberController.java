@@ -52,7 +52,7 @@ public class MemberController {
 	
 	// 자식 부서 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/departments/{parentId}")
+	@GetMapping("/api/departments/{parentId}")
 	public ResponseEntity<List<Department>> deptDetailList(
 			@PathVariable Integer parentId
 			){
@@ -67,7 +67,7 @@ public class MemberController {
 	
 	// 직위 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/positions")
+	@GetMapping("/api/positions")
 	public ResponseEntity<List<Position>> posiList(){
 		List<Position> posiList = service.posiList();
 		
@@ -80,7 +80,7 @@ public class MemberController {
 	
 	// 사원 조회
 	@CrossOrigin(origins="http://localhost:5173")
-	@GetMapping("/members")
+	@GetMapping("/api/members")
 	public ResponseEntity<List<MemberResponse>> memberList(
 			@RequestParam Map<String,String> searchParams
 			){		
@@ -96,7 +96,7 @@ public class MemberController {
 	// 사원 상세 조회
 	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
-	@GetMapping("/members/{userNo}")
+	@GetMapping("/api/members/{userNo}")
 	public ResponseEntity<MemberResponse> memberDetail(
 			@PathVariable Long userNo
 			){
@@ -122,7 +122,7 @@ public class MemberController {
 	// 사원 등록
 	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
-	@PostMapping("/members")
+	@PostMapping("/api/members")
 	public ResponseEntity<Void> memberInsert(
 			@RequestPart("data") MemberPost member,
 			@RequestPart(value = "profile", required = false) MultipartFile profile
@@ -139,7 +139,7 @@ public class MemberController {
 	// 사원 정보 수정
 	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
-	@PatchMapping("/members/{userNo}")
+	@PatchMapping("/api/members/{userNo}")
 	public ResponseEntity<Void> memberUpdate(
 			@PathVariable Long userNo,
 			@RequestPart(value= "memberdata") MemberPatch member,
@@ -158,7 +158,7 @@ public class MemberController {
 	// 사원 정보 삭제
 	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
-	@DeleteMapping("members/{userNo}")
+	@DeleteMapping("/api/members/{userNo}")
 	public ResponseEntity<Void> memberDelete(
 			@PathVariable Long userNo
 			) {
@@ -172,7 +172,7 @@ public class MemberController {
 	}
 	
 	// 남건후
-    @GetMapping("/CalendarMembers")
+    @GetMapping("/api/CalendarMembers")
     public ResponseEntity<List<MemberDto.MemberLite>> search(
             @RequestParam(required = false, defaultValue = "") String query,
             @RequestParam(required = false, defaultValue = "30") Integer limit,
@@ -180,7 +180,7 @@ public class MemberController {
     ) {
         return ResponseEntity.ok(service.search(query, limit, depId));
     }
-    @GetMapping("/CalendarDepartments")
+    @GetMapping("/api/CalendarDepartments")
     public ResponseEntity<List<MemberDto.DepartmentLite>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }

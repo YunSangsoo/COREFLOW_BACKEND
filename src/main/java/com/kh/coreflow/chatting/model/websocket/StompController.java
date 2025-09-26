@@ -56,7 +56,7 @@ public class StompController {
     }
 
     @MessageMapping("/chat/exit/{roomNo}")
-    @SendTo("/api/topic/room/{roomNo}")
+    @SendTo("/topic/room/{roomNo}")
     public chatMessages handleExit(
             @DestinationVariable Long roomNo,
             Authentication auth,
