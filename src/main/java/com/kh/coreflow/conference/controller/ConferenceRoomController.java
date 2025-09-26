@@ -1,5 +1,6 @@
 package com.kh.coreflow.conference.controller;
 
+import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.kh.coreflow.common.model.service.FileService;
 import com.kh.coreflow.conference.model.dto.ConferenceRoomDto;
 import com.kh.coreflow.conference.service.ConferenceRoomService;
 import com.kh.coreflow.model.dto.UserDto.UserDeptPoscode;
@@ -53,6 +56,9 @@ public class ConferenceRoomController {
 
     private final ConferenceRoomService service;
     private final com.kh.coreflow.calendar.model.service.EventService eventService;
+    
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     /* 회의실 목록 조회 */
     @GetMapping
@@ -126,10 +132,22 @@ public class ConferenceRoomController {
         if (file.isEmpty()) return ResponseEntity.badRequest().build();
         String ct = Optional.ofNullable(file.getContentType()).orElse("");
         if (!ct.contains("svg")) return ResponseEntity.status(415).build(); // SVG만 허용
+        
+
+		String projectRootPath = new File("").getAbsolutePath();
+		String serverFolderPath = Paths.get(projectRootPath, uploadDir, "R").toString();
+	    File f = new File(serverFolderPath);
+	    if(!f.exists()) {
+	        f.mkdirs();
+	    }
+		Path dir = Paths.get(projectRootPath, uploadDir, "R");
+        
+        
 
         // 저장 디렉토리 (운영 환경에 맞게 조정)
-        Path dir = Paths.get(System.getProperty("user.home"), "coreflow", "floormaps");
-        Files.createDirectories(dir);
+        //Path dir = Paths.get(System.getProperty("user.home"), "coreflow", "floormaps");
+        
+        //Files.createDirectories(dir);
 
         String filename = "floor-" + System.currentTimeMillis() + ".svg";
         Path dest = dir.resolve(filename);
@@ -147,14 +165,18 @@ public class ConferenceRoomController {
     // 정적 매핑 파일 없이 컨트롤러에서 직접 서빙
     @GetMapping(value = "/floormaps/{name:.+}", produces = "image/svg+xml")
     public ResponseEntity<byte[]> getFloorMap(@PathVariable("name") String name) throws Exception {
-        Path file = Paths.get(System.getProperty("user.home"), "coreflow", "floormaps", name);
+		String projectRootPath = new File("").getAbsolutePath();
+		Path file = Paths.get(projectRootPath, uploadDir, "R",name);
+        //Path file = Paths.get(System.getProperty("user.home"), "coreflow", "floormaps", name);
         if (!Files.exists(file)) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(Files.readAllBytes(file));
     }
 
     // 업로드 폴더 경로 (공통)
     private Path floorMapDir() throws Exception {
-        Path dir = Paths.get(System.getProperty("user.home"), "coreflow", "floormaps");
+		String projectRootPath = new File("").getAbsolutePath();
+		Path dir = Paths.get(projectRootPath, uploadDir, "R");
+        //Path dir = Paths.get(System.getProperty("user.home"), "coreflow", "floormaps");
         Files.createDirectories(dir);
         return dir;
     }
