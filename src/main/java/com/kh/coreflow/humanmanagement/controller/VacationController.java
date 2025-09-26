@@ -7,7 +7,6 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,7 +36,6 @@ public class VacationController {
 	private final VacationService service;
 
 	// 연차 정보 조회
-	@CrossOrigin(origins = "http://localhost:5173")
 	@GetMapping("/api/vacation/info")
 	public ResponseEntity<List<VacationInfo>> vacInfo() {
 		List<VacationInfo> vacInfoList = service.vacInfo();
@@ -50,7 +48,6 @@ public class VacationController {
 	}
 
 	// 모든 사원 휴가 내역 조회
-	@CrossOrigin(origins = "http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/api/vacation/member")
 	public ResponseEntity<List<MemberVacation>> allVacation(@RequestParam int year, @RequestParam int month) {
@@ -70,7 +67,6 @@ public class VacationController {
 	}
 
 	// 검색 사원 조회
-	@CrossOrigin(origins = "http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/api/vacation/member/search")
 	public ResponseEntity<List<MemberChoice>> memberChoice(
@@ -85,7 +81,6 @@ public class VacationController {
 	}
 
 	// 검색 사원 휴가 내역 조회
-	@CrossOrigin(origins = "http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/api/vacation/member/{userNo}")
 	public ResponseEntity<List<MemberVacation>> MemberVacation(@PathVariable int userNo, @RequestParam int year,
@@ -106,7 +101,6 @@ public class VacationController {
 	}
 
 	// 휴가 상태 변경
-	@CrossOrigin(origins = "http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@PatchMapping("/api/vacation/member/{vacId}")
 	public ResponseEntity<Void> vacStatusUpdate(@PathVariable int vacId, @RequestBody PutVacStatus putVacStatus) {
@@ -124,7 +118,6 @@ public class VacationController {
 	}
 
 	// 로그인 회원 정보 조회
-	@CrossOrigin(origins = "http://localhost:5173")
 	@GetMapping("/api/user/profile")
 	public ResponseEntity<LoginUser> loginUserProfile(Authentication auth) {
 		long userNo = ((UserDeptPoscode) auth.getPrincipal()).getUserNo();
@@ -138,7 +131,6 @@ public class VacationController {
 	}
 
 	// 로그인 회원 휴가 내역 조회
-	@CrossOrigin(origins = "http://localhost:5173")
 	@GetMapping("/api/vacation/personal")
 	public ResponseEntity<List<MemberVacation>> personalVacation(Authentication auth, @RequestParam int year) {
 		long userNo = ((UserDeptPoscode) auth.getPrincipal()).getUserNo();
@@ -157,7 +149,6 @@ public class VacationController {
 	}
 
 	// 로그인 회원 사용 가능 휴가 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/api/vacation/personal-available")
 	public ResponseEntity<AvailableVacations> availableVacations(
 			Authentication auth,
@@ -179,7 +170,6 @@ public class VacationController {
 	}
 
 	// 휴가 종류 조회
-	@CrossOrigin(origins = "http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/api/vacation/type")
 	public ResponseEntity<List<VacType>> vacType() {
@@ -193,7 +183,6 @@ public class VacationController {
 	}
 
 	// 로그인 회원 휴가 신청
-	@CrossOrigin(origins = "http://localhost:5173")
 	@PutMapping("/api/vacation/personal")
 	public ResponseEntity<Void> putPerVac(Authentication auth, @RequestBody PutVacation putVacation) {
 		

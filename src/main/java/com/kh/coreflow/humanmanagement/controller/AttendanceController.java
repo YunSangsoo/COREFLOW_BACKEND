@@ -9,7 +9,6 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +36,6 @@ public class AttendanceController {
 	private final AttendanceService service;
 	
 	// 전체 사원 근태 정보 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/member")
 	public ResponseEntity<List<AttendanceInfo>> allAttendance(
@@ -61,7 +59,6 @@ public class AttendanceController {
 	}
 	
 	// 로그인 사용자 근태 정보 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/personal")
 	public ResponseEntity<List<AttendanceInfo>> personalAttendance(
 			Authentication auth,
@@ -85,7 +82,6 @@ public class AttendanceController {
 	}
 	
 	// 출근버튼 클릭시 
-	@CrossOrigin(origins="http://localhost:5173")
 	@PostMapping("/checkIn")
 	public ResponseEntity<Void> checkIn(
 			Authentication auth,
@@ -107,7 +103,6 @@ public class AttendanceController {
 	}
 	
 	// 퇴근버튼 클릭시
-	@CrossOrigin(origins="http://localhost:5173")
 	@PatchMapping("/checkOut")
 	public ResponseEntity<Void> checkOut(
 			@RequestBody PutCheckOut checkOut
@@ -122,7 +117,6 @@ public class AttendanceController {
 	}
 	
 	// 비고 종류 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/vacType")
 	public ResponseEntity<List<VacType>> vacationType(
@@ -138,7 +132,6 @@ public class AttendanceController {
 	}
 	
 	// 비고 수정
-	@CrossOrigin(origins="http://localhost:5173")
 	@PatchMapping("/vacType")
 	public ResponseEntity<Void> vacationTypeUpdate(
 			@RequestBody VacTypeUpdate vacTypeUpdate

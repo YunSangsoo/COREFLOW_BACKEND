@@ -18,7 +18,7 @@
 		LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
 		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
 		LEFT JOIN VACATION_TYPE T ON T.VAC_CODE = A.STATUS
-		WHERE A.ATT_DATE = #{attDate}
+		WHERE A.ATT_DATE = TO_DATE(#{attDate}, 'YYYY-MM-DD')
 		<if test="userNo != null">
 			AND A.USER_NO = #{userNo}
 		</if>
@@ -50,7 +50,7 @@
 	<!-- 출근버튼 -->
 	<insert id="checkIn" parameterType="map">
 		INSERT INTO ATTENDANCE(ATT_DATE,USER_NO, CHECK_IN_TIME,STATUS)
-		VALUES(#{checkIn.attDate}, #{userNo}, #{checkIn.checkInTime}, #{checkIn.status})
+		VALUES(TO_DATE(#{checkIn.attDate}, 'YYYY-MM-DD'), #{userNo}, #{checkIn.checkInTime}, #{checkIn.status})
 	</insert>
 
 	<!-- 퇴근버튼 -->

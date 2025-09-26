@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -38,7 +37,6 @@ public class MemberController {
 	private final FileService fileService;
 	
 	// 부모 부서 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/api/departments")
 	public ResponseEntity<List<Department>> deptList(){
 		List<Department> deptList = service.deptList();
@@ -51,7 +49,6 @@ public class MemberController {
 	}
 	
 	// 자식 부서 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/api/departments/{parentId}")
 	public ResponseEntity<List<Department>> deptDetailList(
 			@PathVariable Integer parentId
@@ -66,7 +63,6 @@ public class MemberController {
 	}
 	
 	// 직위 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/api/positions")
 	public ResponseEntity<List<Position>> posiList(){
 		List<Position> posiList = service.posiList();
@@ -79,7 +75,6 @@ public class MemberController {
 	}
 	
 	// 사원 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@GetMapping("/api/members")
 	public ResponseEntity<List<MemberResponse>> memberList(
 			@RequestParam Map<String,String> searchParams
@@ -94,7 +89,6 @@ public class MemberController {
 	}
 	
 	// 사원 상세 조회
-	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@GetMapping("/api/members/{userNo}")
 	public ResponseEntity<MemberResponse> memberDetail(
@@ -120,7 +114,6 @@ public class MemberController {
 	}
 	
 	// 사원 등록
-	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@PostMapping("/api/members")
 	public ResponseEntity<Void> memberInsert(
@@ -137,7 +130,6 @@ public class MemberController {
 	}
 	
 	// 사원 정보 수정
-	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@PatchMapping("/api/members/{userNo}")
 	public ResponseEntity<Void> memberUpdate(
@@ -156,7 +148,6 @@ public class MemberController {
 	}
 	
 	// 사원 정보 삭제
-	@CrossOrigin(origins="http://localhost:5173")
 	@PreAuthorize("hasAnyRole('ADMIN','HR')")
 	@DeleteMapping("/api/members/{userNo}")
 	public ResponseEntity<Void> memberDelete(
