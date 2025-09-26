@@ -67,7 +67,7 @@
 	    #{calId}, #{name}, #{color}, #{defaultRole},
 	    #{ownerUserNo},
 	    /* dep_id: 파라미터 없으면 내 부서로 자동 채움 */
-	    NVL(#{deptId, jdbcType=NUMERIC}, (SELECT DEP_ID FROM MEMBER WHERE USER_NO = #{ownerUserNo})),
+	    NVL(#{depId, jdbcType=NUMERIC}, (SELECT DEP_ID FROM MEMBER WHERE USER_NO = #{ownerUserNo})),
 	    'N',
 	    #{ownerUserNo}, SYSTIMESTAMP,
 	    #{ownerUserNo}, SYSTIMESTAMP
@@ -77,14 +77,13 @@
   <!-- UPDATE (소유자만) -->
   <update id="updateCalendar" parameterType="map">
 	  UPDATE CALENDAR
-	     SET CAL_NAME     = #{name},
-	         COLOR        = #{color},
-	         DEFAULT_ROLE = #{defaultRole},
-	         UPDATE_USER_NO = #{ownerUserNo},
-	         UPDATE_DATE  = SYSTIMESTAMP
-	   WHERE CAL_ID = #{calId}
+	     SET CAL_NAME      = #{name}
+	       , COLOR         = #{color}
+	       , UPDATE_DATE   = SYSDATE      <!-- ★ UPDATE_AT 금지 -->
+	       , UPDATE_USER_NO= #{ownerUserNo}
+	   WHERE CAL_ID        = #{calId}
 	     AND OWNER_USER_NO = #{ownerUserNo}
-	     AND DELETED_YN = 'N'
+	     AND NVL(DELETED_YN,'N') = 'N'
 	</update>
 
   <!-- 논리삭제 (소유자만) -->
@@ -96,7 +95,15 @@
        AND OWNER_USER_NO = #{ownerUserNo}
        AND DELETED_YN    = 'N'
   </update>
-
+  <update id="deleteCalendarByEditor" parameterType="map">
+	UPDATE CALENDAR
+	SET DELETED_YN   = 'Y',
+	  UPDATE_DATE  = SYSTIMESTAMP,
+	  UPDATE_USER_NO = #{userNo}
+	WHERE CAL_ID = #{calId}
+	  AND NVL(DELETED_YN,'N') = 'N'
+  </update>
+  
   <!-- 캘린더 접근 가능여부(권한 체크) -->
   <select id="existsCalendarAccess" parameterType="map" resultType="int">
     WITH MY_ORG AS (
@@ -130,4 +137,226 @@
     )
   </select>
 
+  <!-- 소유자 여부 -->
+  <select id="isCalendarOwner" parameterType="map" resultType="int">
+    SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS is_owner
+    FROM CALENDAR
+    WHERE CAL_ID = #{calId}
+      AND OWNER_USER_NO = #{userNo}
+      AND DELETED_YN = 'N'
+  </select>
+
+  <!-- DEFAULT_ROLE 조회 -->
+  <select id="selectCalendarDefaultRole" parameterType="long" resultType="string">
+    SELECT DEFAULT_ROLE
+    FROM CALENDAR
+    WHERE CAL_ID = #{calId}
+  </select>
+
+  <!-- 공유 목록 조회 -->
+  <select id="selectCalendarMemberShares"
+          parameterType="long"
+          resultType="com.kh.coreflow.calendar.model.dto.CalendarDto$ShareUser">
+    SELECT USER_NO AS userNo, ROLE AS role
+    FROM CALENDAR_MEMBER
+    WHERE CAL_ID = #{calId}
+    ORDER BY USER_NO
+  </select>
+
+  <select id="selectCalendarDeptShares"
+          parameterType="long"
+          resultType="com.kh.coreflow.calendar.model.dto.CalendarDto$ShareDept">
+    SELECT DEP_ID AS depId, ROLE AS role
+    FROM CALENDAR_DEP_SHARE
+    WHERE CAL_ID = #{calId}
+    ORDER BY DEP_ID
+  </select>
+
+  <select id="selectCalendarPosShares"
+          parameterType="long"
+          resultType="com.kh.coreflow.calendar.model.dto.CalendarDto$SharePos">
+    SELECT POS_ID AS posId, ROLE AS role
+    FROM CALENDAR_POS_SHARE
+    WHERE CAL_ID = #{calId}
+    ORDER BY POS_ID
+  </select>
+
+  <!-- REPLACE: 전체 삭제 -->
+  <delete id="deleteAllMemberShares" parameterType="long">
+    DELETE FROM CALENDAR_MEMBER WHERE CAL_ID = #{calId}
+  </delete>
+  <delete id="deleteAllDeptShares" parameterType="long">
+    DELETE FROM CALENDAR_DEP_SHARE WHERE CAL_ID = #{calId}
+  </delete>
+  <delete id="deleteAllPosShares" parameterType="long">
+    DELETE FROM CALENDAR_POS_SHARE WHERE CAL_ID = #{calId}
+  </delete>
+
+  <!-- MERGE: 동일 키 선삭제 -->
+  <delete id="deleteMemberSharesInList" parameterType="map">
+    DELETE FROM CALENDAR_MEMBER
+    WHERE CAL_ID = #{calId}
+      AND USER_NO IN
+      <foreach collection="list" item="it" open="(" close=")" separator=",">
+        #{it.userNo}
+      </foreach>
+  </delete>
+
+  <delete id="deleteDeptSharesInList" parameterType="map">
+    DELETE FROM CALENDAR_DEP_SHARE
+    WHERE CAL_ID = #{calId}
+      AND DEP_ID IN
+      <foreach collection="list" item="it" open="(" close=")" separator=",">
+        #{it.depId}
+      </foreach>
+  </delete>
+
+  <delete id="deletePosSharesInList" parameterType="map">
+    DELETE FROM CALENDAR_POS_SHARE
+    WHERE CAL_ID = #{calId}
+      AND POS_ID IN
+      <foreach collection="list" item="it" open="(" close=")" separator=",">
+        #{it.posId}
+      </foreach>
+  </delete>
+
+  <!-- BULK INSERT (Oracle INSERT ALL) -->
+  <insert id="insertMemberSharesBulk" parameterType="map">
+    <choose>
+      <when test="list != null and list.size() > 0">
+        INSERT ALL
+        <foreach collection="list" item="it">
+          INTO CALENDAR_MEMBER (CAL_ID, USER_NO, ROLE, ADDED_AT)
+		  VALUES (#{calId}, #{it.userNo}, #{it.role}, SYSTIMESTAMP)
+        </foreach>
+        SELECT 1 FROM DUAL
+      </when>
+      <otherwise>
+        SELECT 1 FROM DUAL
+      </otherwise>
+    </choose>
+  </insert>
+
+  <insert id="insertDeptSharesBulk" parameterType="map">
+    <choose>
+      <when test="list != null and list.size() > 0">
+        INSERT ALL
+        <foreach collection="list" item="it">
+          INTO CALENDAR_DEP_SHARE (CAL_ID, DEP_ID, ROLE, ADDED_AT)
+		  VALUES (#{calId}, #{it.depId}, #{it.role}, SYSTIMESTAMP)
+        </foreach>
+        SELECT 1 FROM DUAL
+      </when>
+      <otherwise>
+        SELECT 1 FROM DUAL
+      </otherwise>
+    </choose>
+  </insert>
+
+  <insert id="insertPosSharesBulk" parameterType="map">
+    <choose>
+      <when test="list != null and list.size() > 0">
+        INSERT ALL
+        <foreach collection="list" item="it">
+          INTO CALENDAR_POS_SHARE (CAL_ID, POS_ID, ROLE, ADDED_AT)
+		  VALUES (#{calId}, #{it.posId}, #{it.role}, SYSTIMESTAMP)
+        </foreach>
+        SELECT 1 FROM DUAL
+      </when>
+      <otherwise>
+        SELECT 1 FROM DUAL
+      </otherwise>
+    </choose>
+  </insert>
+
+	<!-- 부서: parentId 하위 조회 -->
+	<select id="selectDepartmentsByParent" parameterType="map" resultType="map">
+	  SELECT
+	    d.DEP_ID    AS "depId",
+	    d.DEP_NAME  AS "depName",
+	    d.PARENT_ID AS "parentId"
+	  FROM DEPARTMENT d
+	  WHERE (#{parentId} IS NULL AND d.PARENT_ID IS NULL)
+	     OR (#{parentId} IS NOT NULL AND d.PARENT_ID = #{parentId})
+	  ORDER BY d.DEP_NAME
+	</select>
+	
+	<!-- 직급 전체 -->
+	<select id="selectAllPositions" resultType="map">
+	  SELECT
+	    p.POS_ID   AS "posId",
+	    p.POS_NAME AS "posName"
+	  FROM POSITIONS p
+	  ORDER BY p.POS_NAME
+	</select>
+	
+	<!-- 사원 검색 (이름/이메일 부분 검색, 부서 필터 선택) -->
+	<select id="searchMembers" parameterType="map" resultType="map">
+	  SELECT
+	    m.USER_NO  AS userNo,      
+	    m.NAME     AS name,        
+	    d.DEP_NAME AS depName,    
+	    p.POS_NAME AS posName     
+	  FROM MEMBER m
+	  LEFT JOIN DEPARTMENT d ON d.DEP_ID = m.DEP_ID
+	  LEFT JOIN POSITIONS  p ON p.POS_ID = m.POS_ID
+	  WHERE
+	    (#{query} IS NULL OR #{query} = ''
+	     OR UPPER(m.NAME)  LIKE '%' || UPPER(#{query}) || '%'
+	     OR UPPER(m.EMAIL) LIKE '%' || UPPER(#{query}) || '%')
+	    AND (#{depId} IS NULL OR m.DEP_ID = #{depId})
+	  ORDER BY m.NAME
+	  FETCH FIRST #{limit} ROWS ONLY
+	</select>
+
+	<!-- 효과적 권한 계산: 개인(cm) > 직급(cps) > 부서(cds) -->
+<select id="selectEffectiveCalendarRoleForUser" parameterType="map" resultType="string">
+  SELECT role FROM (
+    SELECT 'OWNER' AS role, 1 AS prio
+      FROM CALENDAR c
+     WHERE c.CAL_ID = #{calId}
+       AND c.OWNER_USER_NO = #{userNo}
+       AND NVL(c.DELETED_YN,'N') = 'N'
+
+    UNION ALL
+    SELECT UPPER(cm.ROLE) AS role, 2 AS prio
+      FROM CALENDAR_MEMBER cm
+     WHERE cm.CAL_ID = #{calId}
+       AND cm.USER_NO = #{userNo}
+
+    UNION ALL
+    SELECT UPPER(ps.ROLE) AS role, 3 AS prio
+      FROM MEMBER u
+      JOIN CALENDAR_POS_SHARE ps
+        ON ps.POS_ID = u.POS_ID
+       AND ps.CAL_ID = #{calId}
+     WHERE u.USER_NO = #{userNo}
+
+    UNION ALL
+    SELECT UPPER(ds.ROLE) AS role, 4 AS prio
+      FROM MEMBER u
+      JOIN CALENDAR_DEP_SHARE ds
+        ON ds.DEP_ID = u.DEP_ID
+       AND ds.CAL_ID = #{calId}
+     WHERE u.USER_NO = #{userNo}
+
+    UNION ALL
+    SELECT UPPER(c.DEFAULT_ROLE) AS role, 99 AS prio
+      FROM CALENDAR c
+     WHERE c.CAL_ID = #{calId}
+  )
+  ORDER BY prio
+  FETCH FIRST 1 ROWS ONLY
+</select>
+	
+	<!-- 에디터(= 소유자 아님)도 실행 가능한 업데이트(권한은 서비스에서 선확인) -->
+	<update id="updateCalendarByEditor">
+	  UPDATE CALENDAR
+	     SET CAL_NAME = #{req.calName},
+	         COLOR    = #{req.color},
+	         UPDATE_AT = SYSTIMESTAMP,
+	         UPDATE_USER_NO = #{req.updateUserNo}
+	   WHERE CAL_ID = #{calId}
+	     AND NVL(DELETED_YN,'N') = 'N'
+	</update>
 </mapper>

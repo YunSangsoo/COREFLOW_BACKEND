@@ -66,8 +66,13 @@ public class ChattingDaoImpl implements ChattingDao {
 	}
 
 	@Override
-	public List<chatMessages> getMessages(Long roomId) {
-		return session.selectList("chat.getMessages",roomId);
+	public List<chatMessages> getMessages(Long roomId, Long userNo) {
+		Map<String, Object> params = new HashMap<>();
+	    
+	    params.put("roomId", roomId);
+	    params.put("userNo", userNo);
+	    
+		return session.selectList("chat.getMessages",params);
 	}
 
 	@Override

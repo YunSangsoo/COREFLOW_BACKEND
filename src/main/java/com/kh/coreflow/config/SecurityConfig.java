@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -69,7 +68,7 @@ public class SecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 		
 		// 허용 Origin설정
-		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
+		config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000", "http://3.37.61.74"));
 		
 		// 허용 메서드
 		config.setAllowedMethods(List.of("GET","POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

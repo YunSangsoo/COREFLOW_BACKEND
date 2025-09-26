@@ -37,7 +37,7 @@ public class NoticeDto {
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class NoticeInsert{
-		private long notiId;
+		private Long notiId;
 		private long userNo;
 		private String title;
 		private String content;

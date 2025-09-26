@@ -105,8 +105,8 @@ public class ChattingServiceImpl implements ChattingService {
 	}
 
 	@Override
-	public List<chatMessages> getMessages(Long roomId) {
-		return chattingDao.getMessages(roomId);
+	public List<chatMessages> getMessages(Long roomId, Long userNo) {
+		return chattingDao.getMessages(roomId,userNo);
 	}
 
 	@Override

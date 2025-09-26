@@ -2,6 +2,8 @@ package com.kh.coreflow.humanmanagement.model.dto;
 
 import java.util.Date;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.kh.coreflow.common.model.vo.FileDto.customFile;
 
 import lombok.AllArgsConstructor;
@@ -46,6 +48,7 @@ public class MemberDto {
 		private String addressDetail;
 		private Date updateDate;
 		private String status;
+		private customFile profile;
 	}
 	
 	@Data
@@ -85,6 +88,7 @@ public class MemberDto {
 		private String addressDetail;
 		private Date updateDate;
 		private String status;
+		private MultipartFile file;
 	}
 	
 	// 남건후

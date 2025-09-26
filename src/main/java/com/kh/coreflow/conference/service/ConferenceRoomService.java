@@ -24,4 +24,10 @@ public interface ConferenceRoomService {
     ReservationRes updateReservationTime(Long resvId, ReservationTimeUpdateReq req, Long userNo);
     List<AvailabilityRes> searchAvailability(Timestamp startAt, Timestamp endAt,
                                              Integer minCapacity, String buildingName, String floor);
+  
+    ConferenceRoomDto.RoomDetailRes getRoomDetail(Long actorUserNo, Long roomId, String fromStr, String toStr);
+    void updateRoom(Long roomId, ConferenceRoomDto.CreateReq req, Long userNo);
+    void deleteRoom(Long roomId, Long userNo);
+
+
 }

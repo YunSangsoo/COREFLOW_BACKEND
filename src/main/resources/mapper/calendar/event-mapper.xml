@@ -325,7 +325,7 @@
   <!-- 권한 체크: HR/ADMIN 보유 여부 -->
   <select id="countHrOrAdmin" parameterType="long" resultType="int">
     SELECT COUNT(1)
-      FROM COREFLOW.AUTHORITIES
+      FROM COREFLOW.AUTHORITY
      WHERE USER_NO = #{value}
        AND AUTHORITY IN ('ROLE_HR','ROLE_ADMIN')
   </select>
@@ -337,6 +337,26 @@
 	  UPDATE_DATE = SYSDATE
 	WHERE EVENT_ID = #{eventId}
   </update>
+  
+  <!-- 관리자 여부: ROLE_ADMIN (+ 필요 시 ROLE_HR 포함) -->
+	<select id="hasAdminAuthority" parameterType="long" resultType="int">
+	  SELECT CASE WHEN EXISTS (
+	    SELECT 1
+	      FROM AUTHORITY a
+	     WHERE a.USER_NO = #{userNo}
+	       AND UPPER(a.AUTHORITY) IN ('ROLE_ADMIN'/*, 'ROLE_HR'*/)
+	  ) THEN 1 ELSE 0 END AS yes
+	  FROM DUAL
+	</select>
+
+<select id="selectEventCreator" parameterType="long" resultType="long">
+  SELECT CREATE_BY_USER_NO
+    FROM EVENT
+   WHERE EVENT_ID = #{eventId}
+     AND STATUS &lt;&gt; 'DELETED'
+</select>
+  
+  
 </mapper>
 
 

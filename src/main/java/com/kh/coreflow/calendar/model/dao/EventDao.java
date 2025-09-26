@@ -46,4 +46,8 @@ public interface EventDao {
 
 	List<EventDto.Member> selectAttendeesByEventId(Long eventId);
 	List<EventDto.Member> selectSharersByEventId(Long eventId);
+	
+	boolean hasAdminAuthority(Long userNo);
+	Long selectEventCreator(Long eventId);
+
 }

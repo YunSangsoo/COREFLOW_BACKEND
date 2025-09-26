@@ -78,4 +78,12 @@ public class VacationDto {
 		private Date vacEnd;
 		private float vacAmount;
 	}
+	
+	@Data
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class AvailableVacations{
+		private int vacAmount;
+		private float vacRemaining;
+	}
 }

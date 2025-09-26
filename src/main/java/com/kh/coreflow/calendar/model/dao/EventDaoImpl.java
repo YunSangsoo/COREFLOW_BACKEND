@@ -167,4 +167,15 @@ public class EventDaoImpl implements EventDao {
     public List<EventDto.Member> selectSharersByEventId(Long eventId) {
       return sql.selectList("event.selectSharersByEventId", eventId);
     }
+    
+    @Override
+    public boolean hasAdminAuthority(Long userNo) {
+        Integer n = sql.selectOne("event.hasAdminAuthority", userNo);
+        return n != null && n > 0;
+    }
+
+    @Override
+    public Long selectEventCreator(Long eventId) {
+        return sql.selectOne("event.selectEventCreator", eventId);
+    }
 }

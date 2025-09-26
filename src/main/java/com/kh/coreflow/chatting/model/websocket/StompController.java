@@ -47,22 +47,35 @@ public class StompController {
     ) {
         message.setType(chatMessages.MessageType.ENTER);
         message.setMessageText(message.getUserName() + "님이 입장하셨습니다.");
-        // ChatMessage 객체를 반환하면 @SendTo 경로로 자동 브로드캐스팅됩니다.
-        return message;
+
+    	int result = service.insertMessage(message);
+    	if(result>0)
+    		return message;
+    	else
+    		return null;
     }
 
     @MessageMapping("/chat/exit/{roomNo}")
     @SendTo("/topic/room/{roomNo}")
     public chatMessages handleExit(
-            @DestinationVariable int roomNo,
+            @DestinationVariable Long roomNo,
+            Authentication auth,
             chatMessages message
     ) {
         //service.exitChatRoom(message); // 서비스 로직 호출
 
+    	Long userNo = ((UserDeptPoscode)auth.getPrincipal()).getUserNo();
         message.setType(chatMessages.MessageType.EXIT);
+    	message.setUserNo(userNo);
         message.setMessageText(message.getUserName() + "님이 퇴장하셨습니다.");
-
-        return message;
+    	User user = authService.findUserByUserNo(userNo).get();
+    	message.setUserName(user.getUserName());
+    	
+    	int result = service.insertMessage(message);
+    	if(result>0)
+    		return message;
+    	else
+    		return null;
     }
     
     //메시지 전송을 위한 컨트롤러

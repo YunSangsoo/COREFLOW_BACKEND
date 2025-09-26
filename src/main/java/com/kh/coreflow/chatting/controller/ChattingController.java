@@ -193,7 +193,7 @@ public class ChattingController {
 			@PathVariable("roomId") Long roomId,
 			@AuthenticationPrincipal UserDeptPoscode user
 			){
-		List<chatMessages> list = chattingService.getMessages(roomId);
+		List<chatMessages> list = chattingService.getMessages(roomId,user.getUserNo());
 		if(list!=null) {
 			for(chatMessages el : list) {
 				if(el.getType()==chatMessages.MessageType.FILE) {

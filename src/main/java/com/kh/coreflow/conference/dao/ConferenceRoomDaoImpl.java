@@ -112,4 +112,37 @@ public class ConferenceRoomDaoImpl implements ConferenceRoomDao{
         p.put("userNo", userNo);
         return sqlSession.update("conferenceRoom.deleteReservationsByEventId", p);
     }
+    
+    @Override
+    public ConferenceRoomDto.Room selectRoomByIdForDetail(Long roomId) {
+        return sqlSession.selectOne("conferenceRoom.selectRoomByIdForDetail", roomId);
+    }
+    
+    @Override
+    public List<ConferenceRoomDto.RoomReservationRes> selectReservationsByRoomAndPeriod(Long roomId, Timestamp from, Timestamp to) {
+        Map<String,Object> p = new HashMap<>();
+        p.put("roomId", roomId);
+        p.put("from", from);
+        p.put("to", to);
+        return sqlSession.selectList("conferenceRoom.selectReservationsByRoomAndPeriod", p);
+    }
+    
+    @Override
+    public int updateRoom(Long roomId, ConferenceRoomDto.CreateReq p, Long userNo) {
+        Map<String,Object> params = new HashMap<>();
+        params.put("roomId", roomId);
+        params.put("p", p);
+        params.put("userNo", userNo);
+        return sqlSession.update("conferenceRoom.updateRoom", params);
+    }
+    
+    @Override
+    public int deleteRoom(Long roomId) {
+        return sqlSession.delete("conferenceRoom.deleteRoom", roomId);
+    }
+
+    @Override
+    public int countActiveEventsByRoom(Long roomId) {
+        return sqlSession.selectOne("conferenceRoom.countActiveEventsByRoom", roomId);
+    }
 }
