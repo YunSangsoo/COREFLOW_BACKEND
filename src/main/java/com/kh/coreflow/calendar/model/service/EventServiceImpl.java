@@ -1,6 +1,5 @@
 package com.kh.coreflow.calendar.model.service;
 
-import java.nio.file.AccessDeniedException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -10,14 +9,12 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.kh.coreflow.calendar.model.dao.CalendarDao;
 import com.kh.coreflow.calendar.model.dao.EventDao;
@@ -76,13 +73,46 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<EventDto.Res> getEvents(Long userNo, Long calendarId, String fromStr, String toStr) {
-		LocalDateTime fromLdt = parseClientDateTime(fromStr);
-		LocalDateTime toLdt = parseClientDateTime(toStr);
+	    LocalDateTime fromLdt = parseClientDateTime(fromStr);
+	    LocalDateTime toLdt   = parseClientDateTime(toStr);
+	    Timestamp from = Timestamp.valueOf(fromLdt);
+	    Timestamp to   = Timestamp.valueOf(toLdt);
 
-		Timestamp from = Timestamp.valueOf(fromLdt);
-		Timestamp to = Timestamp.valueOf(toLdt);
+	    List<EventDto.Res> list = eventDao.selectEventsByCalendarAndPeriod(calendarId, from, to);
 
-		return eventDao.selectEventsByCalendarAndPeriod(calendarId, from, to);
+	    String role = effectiveRole(userNo, calendarId); // NONE / BUSY_ONLY / READER / ...
+	    if ("NONE".equalsIgnoreCase(role)) {
+	        return List.of(); // 전혀 보이지 않음
+	    }
+	    if ("BUSY_ONLY".equalsIgnoreCase(role)) {
+	        return list.stream().map(this::maskAsBusyOnly).toList();
+	    }
+	    return list; // READER 이상은 그대로
+	}
+
+	private EventDto.Res maskAsBusyOnly(EventDto.Res src) {
+	    EventDto.Res r = new EventDto.Res();
+	    r.setEventId(src.getEventId());
+	    r.setCalId(src.getCalId());
+	    r.setStartAt(src.getStartAt());
+	    r.setEndAt(src.getEndAt());
+	    r.setAllDayYn(src.getAllDayYn());
+
+	    // 제목/세부정보 모두 가림
+	    r.setTitle("");              // ← 완전 숨김 원하면 빈 문자열 (또는 "바쁨")
+	    r.setStatus("BUSY");         // 프론트가 표시만 ‘바쁨’ 블록으로 처리 가능
+	    r.setLocationText(null);
+	    r.setNote(null);
+	    r.setRoomId(null);
+	    r.setLabelId(null);
+	    r.setTypeId(null);
+	    r.setTypeName(null);
+	    r.setTypeCode(null);
+	    r.setRrule(null);
+	    r.setExdates(null);
+	    r.setCreateByUserNo(null);
+	    r.setUpdateUserNo(null);
+	    return r;
 	}
 
 	// ─────────────────────────────────────────────────────────
@@ -320,23 +350,26 @@ public class EventServiceImpl implements EventService {
 	@Override
 	@Transactional(readOnly = true)
 	public EventDto.DetailRes getEventDetail(Long me, Long eventId) {
-		EventDto.DetailRes res = eventDao.selectEventDetailById(eventId);
-		if (res == null)
-			return null;
+	    EventDto.DetailRes res = eventDao.selectEventDetailById(eventId);
+	    if (res == null) return null;
 
-		res.setAttendees(eventDao.selectAttendeesByEventId(eventId));
-		res.setSharers(eventDao.selectSharersByEventId(eventId));
+	    // 권한 체크: BUSY_ONLY/NONE은 상세 불가
+	    String role = effectiveRole(me, res.getCalId());
+	    if ("NONE".equalsIgnoreCase(role) || "BUSY_ONLY".equalsIgnoreCase(role)) {
+	        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "읽기 권한이 없습니다.");
+	    }
 
-		boolean isAuthor = res.getCreateByUserNo() != null && res.getCreateByUserNo().equals(me);
-		boolean admin = isAdmin(me);
-		String role = effectiveRole(me, res.getCalId()); // DetailRes에 calId가 포함된다고 가정
+	    // 이하 기존 로직 유지
+	    res.setAttendees(eventDao.selectAttendeesByEventId(eventId));
+	    res.setSharers(eventDao.selectSharersByEventId(eventId));
 
-		boolean canAny = canEditAny(admin, role);
-		boolean canOwn = "CONTRIBUTOR".equals(role) && isAuthor;
-
-		res.setCanEdit(canAny || canOwn);
-		res.setCanDelete(canAny || canOwn);
-		return res;
+	    boolean isAuthor = res.getCreateByUserNo() != null && res.getCreateByUserNo().equals(me);
+	    boolean admin = isAdmin(me);
+	    boolean canAny = canEditAny(admin, role);
+	    boolean canOwn = "CONTRIBUTOR".equals(role) && isAuthor;
+	    res.setCanEdit(canAny || canOwn);
+	    res.setCanDelete(canAny || canOwn);
+	    return res;
 	}
 
 	// ─────────────────────────────────────────────────────────
