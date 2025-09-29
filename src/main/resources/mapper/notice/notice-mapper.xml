@@ -115,8 +115,8 @@
 			N.END_TIME
 		FROM NOTICE N
 		LEFT JOIN MEMBER M ON M.USER_NO = N.WRITER
-		LEFT JOIN DEPARTMENT D ON D.DEP_ID = N.DEP_ID
-		LEFT JOIN POSITIONS P ON P.POS_ID = N.POS_ID
+		LEFT JOIN DEPARTMENT D ON D.DEP_ID = M.DEP_ID
+		LEFT JOIN POSITIONS P ON P.POS_ID = M.POS_ID
 		WHERE NOTI_ID = #{notiId}
 	</select>
 	
@@ -125,6 +125,7 @@
 		UPDATE NOTICE
 		<set>
 			<if test="title != null and title != ''">TITLE = #{title},</if>
+			<if test="depId != null">ESSENTIAL = #{essential},</if>
 			<if test="depId != null">DEP_ID = #{depId},</if>
 			<if test="posId != null">POS_ID = #{posId},</if>
 			<if test="endDate != null and !endDate.isEmpty()">END_DATE = #{endDate},</if>

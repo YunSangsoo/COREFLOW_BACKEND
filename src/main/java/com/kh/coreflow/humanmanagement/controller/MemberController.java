@@ -104,7 +104,7 @@ public class MemberController {
 		if(profile == null) {
 			customFile tempProfile = new customFile();
 			tempProfile.setChangeName("CHAT_PROFILE_DEFAULT.jpg");
-			tempProfile.setImageCode("P");
+			tempProfile.setImageCode("CP");
 			tempProfile.setOriginName("CHAT_PROFILE_DEFAULT.jpg");
 			profile = tempProfile;
 		}

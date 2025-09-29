@@ -61,8 +61,6 @@ public class NoticeDto {
 		private String userName;
 		private String depName;
 		private String posName;
-		private Long depId;
-		private Long posId;
 		private String enrollDate;
 		private String updateDate;
 		private String content;
