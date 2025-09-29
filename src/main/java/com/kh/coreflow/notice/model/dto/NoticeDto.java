@@ -59,6 +59,7 @@ public class NoticeDto {
 		private String title;
 		private long writer;
 		private String userName;
+		private String depName;
 		private String posName;
 		private Long depId;
 		private Long posId;
