@@ -142,7 +142,8 @@
         	approval_title,
         	approval_type,
         	approval_status,
-        	start_date
+        	start_date,
+        	user_name as writerName
         FROM 
         	approval
         WHERE 

@@ -23,6 +23,7 @@ public class ApprovalDto {
     private String comment; // 승인,반려 사유 작성가능
     private String userName;
     private String processedStatus;
+    private String writerName;
     
     private List<Integer> approverUserNo;
     private List<Integer> ccUserNo;
