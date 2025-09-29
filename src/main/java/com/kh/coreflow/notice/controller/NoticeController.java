@@ -98,7 +98,7 @@ public class NoticeController {
 		
 		NoticeDetail notiDetail = service.notiDetail(notiId);
 		notiDetail.setFiles(files);
-		log.info("files : {}",files);
+
 		if(notiDetail != null) {
 			if(notiDetail.getParentDepId() == null) {
 				notiDetail.setParentDepId(notiDetail.getChildDepId());
