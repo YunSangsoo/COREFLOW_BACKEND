@@ -292,22 +292,25 @@
 	
 	<!-- 사원 검색 (이름/이메일 부분 검색, 부서 필터 선택) -->
 	<select id="searchMembers" parameterType="map" resultType="map">
-	  SELECT
-	    m.USER_NO  AS userNo,      
-	    m.NAME     AS name,        
-	    d.DEP_NAME AS depName,    
-	    p.POS_NAME AS posName     
-	  FROM MEMBER m
-	  LEFT JOIN DEPARTMENT d ON d.DEP_ID = m.DEP_ID
-	  LEFT JOIN POSITIONS  p ON p.POS_ID = m.POS_ID
-	  WHERE
-	    (#{query} IS NULL OR #{query} = ''
-	     OR UPPER(m.NAME)  LIKE '%' || UPPER(#{query}) || '%'
-	     OR UPPER(m.EMAIL) LIKE '%' || UPPER(#{query}) || '%')
-	    AND (#{depId} IS NULL OR m.DEP_ID = #{depId})
-	  ORDER BY m.NAME
-	  FETCH FIRST #{limit} ROWS ONLY
-	</select>
+  SELECT
+    m.USER_NO   AS "userNo",
+    m.USER_NAME AS "userName",   
+    m.EMAIL     AS "email",
+    m.DEP_ID    AS "depId",
+    m.POS_ID    AS "posId",
+    d.DEP_NAME  AS "depName",
+    p.POS_NAME  AS "posName"
+  FROM MEMBER m
+  LEFT JOIN DEPARTMENT d ON d.DEP_ID = m.DEP_ID
+  LEFT JOIN POSITIONS  p ON p.POS_ID = m.POS_ID
+  WHERE
+    (#{query} IS NULL OR #{query} = ''
+     OR UPPER(m.USER_NAME) LIKE '%' || UPPER(#{query}) || '%'
+     OR UPPER(m.EMAIL)     LIKE '%' || UPPER(#{query}) || '%')
+    AND (#{depId} IS NULL OR m.DEP_ID = #{depId})
+  ORDER BY m.USER_NAME
+  FETCH FIRST #{limit} ROWS ONLY
+</select>
 
 	<!-- 효과적 권한 계산: 개인(cm) > 직급(cps) > 부서(cds) -->
 <select id="selectEffectiveCalendarRoleForUser" parameterType="map" resultType="string">
