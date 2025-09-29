@@ -139,6 +139,7 @@
         SELECT 
         	approval_id,
         	user_no,
+        	user_name AS writerName,
         	approval_title,
         	approval_type,
         	approval_status,

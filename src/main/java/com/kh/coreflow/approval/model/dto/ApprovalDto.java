@@ -22,6 +22,7 @@ public class ApprovalDto {
     private String status;	// 문서 상태
     private String comment; // 승인,반려 사유 작성가능
     private String userName;
+    private String writerName; // 메인페이지 작성자명 바인딩
     private String processedStatus;
     
     private List<Integer> approverUserNo;
