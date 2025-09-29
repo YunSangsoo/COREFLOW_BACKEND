@@ -17,7 +17,7 @@
 	</select>
 	
 	<!-- 부서 코드 조회 -->
-	<select id="findDepId" resultType="java.lang.Integer">
+	<select id="findDepId" resultType="long">
 		SELECT DEP_ID
 		FROM DEPARTMENT
 		WHERE DEP_NAME = #{depName}
@@ -31,7 +31,7 @@
 	</select>
 	
 	<!-- 직위코드 조회 -->
-	<select id="findPodId" resultType="int">
+	<select id="findPodId" resultType="long">
 		SELECT POS_ID
 		FROM POSITIONS
 		WHERE POS_NAME = #{posName}
