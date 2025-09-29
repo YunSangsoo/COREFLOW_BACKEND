@@ -1,5 +1,6 @@
 package com.kh.coreflow.notice.model.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,14 @@ public class NoticeServiceImpl implements NoticeService{
 	@Transactional
 	public int notiInsert(NoticeInsert insertParams, List<MultipartFile> files) {
 		int answer = dao.notiInsert(insertParams);
-		fileService.setOrChangeImage(files, insertParams.getNotiId(), "N");
-		return answer;
+        
+        if (files == null) {
+            files = Collections.emptyList();
+        }
+        
+        fileService.setOrChangeImage(files, insertParams.getNotiId(), "N");
+        
+        return answer;
 	}
 
 	@Override
@@ -43,8 +50,14 @@ public class NoticeServiceImpl implements NoticeService{
 	@Transactional
 	public int notiUpdate(NoticeInsert insertParams, List<MultipartFile> files) {
 		int answer = dao.notiUpdate(insertParams);
-		fileService.setOrChangeImage(files, insertParams.getNotiId(), "N");
-		return answer;
+        
+        if (files == null) {
+            files = Collections.emptyList();
+        }
+        
+        fileService.setOrChangeImage(files, insertParams.getNotiId(), "N");
+        
+        return answer;
 	}
 
 	@Override
