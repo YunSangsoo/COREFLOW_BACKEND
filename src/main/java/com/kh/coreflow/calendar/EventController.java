@@ -91,7 +91,7 @@ public class EventController {
     }
     
     @RestController
-    @RequestMapping("/labels") // 최종 경로: /api/labels
+    @RequestMapping("/api/labels") // 최종 경로: /api/labels
     @RequiredArgsConstructor
     class LabelController {
 
